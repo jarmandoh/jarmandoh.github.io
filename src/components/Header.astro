@@ -1,0 +1,291 @@
+---
+// Header - Navegación Superior Sticky
+// Fondo Blanco (#FFFFFF) con logo centrado
+---
+
+<header class="header">
+  <div class="header-container">
+    <!-- Navegación Izquierda -->
+    <nav class="nav-left">
+      <a href="/tratamientos" class="nav-link">Tratamientos</a>
+      <a href="/nosotros" class="nav-link">Nosotros</a>
+    </nav>
+
+    <!-- Logo Central -->
+    <a href="/" class="logo" aria-label="Bel Medicina Estética - Inicio">
+      <img  src="/assets/logo_02.jpg" alt="Bel Medicina Estética" width="50" height="50" class="logo-img" />
+    </a>
+
+    <!-- Navegación Derecha -->
+    <nav class="nav-right">
+      <a href="/blog" class="nav-link">Blog</a>
+      <a href="/contacto" class="nav-link">Contacto</a>
+      <a href="/agendar" class="btn btn-outline btn-nav">Agendar Cita</a>
+    </nav>
+
+    <!-- Menú Móvil -->
+    <button class="mobile-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+      <span class="hamburger"></span>
+    </button>
+  </div>
+
+  <!-- Menú Móvil Expandido -->
+  <nav class="mobile-nav" aria-hidden="true">
+    <a href="/tratamientos" class="mobile-nav-link">Tratamientos</a>
+    <a href="/nosotros" class="mobile-nav-link">Nosotros</a>
+    <a href="/blog" class="mobile-nav-link">Blog</a>
+    <a href="/contacto" class="mobile-nav-link">Contacto</a>
+    <a href="/agendar" class="btn btn-outline mobile-cta">Agendar Cita</a>
+  </nav>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--color-white);
+    box-shadow: none;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Estado al hacer scroll - con blur */
+  .header.scrolled {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+  }
+
+  /* Navegación */
+  .nav-left,
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .nav-link {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: relative;
+    padding: 0.5rem 0;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--color-gray-medium);
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* Logo */
+  .logo {
+    flex-shrink: 0;
+  }
+
+  .logo-img {
+    width: 80px;
+    height: auto;
+  }
+
+  /* Botón Nav */
+  .btn-nav {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Menú Móvil */
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hamburger {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-gray-medium);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-gray-medium);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger::before {
+    top: -8px;
+  }
+
+  .hamburger::after {
+    bottom: -8px;
+  }
+
+  /* Animación hamburguesa a X */
+  .mobile-menu-btn[aria-expanded="true"] .hamburger {
+    background-color: transparent;
+  }
+
+  .mobile-menu-btn[aria-expanded="true"] .hamburger::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .mobile-menu-btn[aria-expanded="true"] .hamburger::after {
+    bottom: 0;
+    transform: rotate(-45deg);
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 2rem;
+    background-color: var(--color-white);
+    border-top: 1px solid var(--color-gray-soft);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
+  }
+
+  .mobile-nav.active {
+    max-height: 400px;
+    opacity: 1;
+    padding: 2rem;
+  }
+
+  .mobile-nav-link {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .mobile-nav.active .mobile-nav-link {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .mobile-nav.active .mobile-nav-link:nth-child(1) { transition-delay: 0.1s; }
+  .mobile-nav.active .mobile-nav-link:nth-child(2) { transition-delay: 0.15s; }
+  .mobile-nav.active .mobile-nav-link:nth-child(3) { transition-delay: 0.2s; }
+  .mobile-nav.active .mobile-nav-link:nth-child(4) { transition-delay: 0.25s; }
+
+  .mobile-cta {
+    margin-top: 1rem;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: transform 0.3s ease 0.3s, opacity 0.3s ease 0.3s;
+  }
+
+  .mobile-nav.active .mobile-cta {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .nav-left,
+    .nav-right {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+    }
+
+    .header-container {
+      justify-content: space-between;
+    }
+
+    .logo {
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo-svg {
+      width: 130px;
+    }
+
+    .header-container {
+      padding: 0.75rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Toggle menú móvil
+  const menuBtn = document.querySelector('.mobile-menu-btn');
+  const mobileNav = document.querySelector('.mobile-nav');
+  const hamburger = document.querySelector('.hamburger');
+
+  menuBtn?.addEventListener('click', () => {
+    const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+    menuBtn.setAttribute('aria-expanded', (!isExpanded).toString());
+    mobileNav?.classList.toggle('active');
+    mobileNav?.setAttribute('aria-hidden', isExpanded.toString());
+  });
+
+  // Header scroll effect
+  let lastScroll = 0;
+  const header = document.querySelector('.header');
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 100) {
+      header?.classList.add('scrolled');
+    } else {
+      header?.classList.remove('scrolled');
+    }
+    
+    lastScroll = currentScroll;
+  });
+</script>

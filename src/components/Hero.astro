@@ -1,0 +1,239 @@
+---
+// Hero Section - Pantalla Principal
+// Imagen a pantalla completa con degradado blanco hacia la izquierda
+---
+
+<section class="hero">
+  <!-- Imagen de fondo con parallax -->
+  <div class="hero-background">
+    <div class="hero-parallax-bg" id="parallax-bg"></div>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">
+        La belleza es un estado de <span class="highlight">equilibrio</span>.
+      </h1>
+      <p class="hero-subtitle">
+        Medicina estética que armoniza tu esencia natural. 
+        Diseño clínico limpio, seguro y pensado para ti.
+      </p>
+      <a href="/agendar" class="btn btn-primary hero-cta">
+        Iniciar mi transformación
+      </a>
+    </div>
+  </div>
+
+  
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* Fondo */
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .hero-parallax-bg {
+    position: absolute;
+    top: -20%;
+    left: 0;
+    width: 100%;
+    height: 140%;
+    background-image: url('/assets/bg_page.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+  }
+
+  /* Overlay con degradado hacia la izquierda */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.95) 25%,
+      rgba(255, 255, 255, 0.7) 50%,
+      rgba(255, 255, 255, 0.3) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* Contenido */
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 4rem;
+    padding-top: 80px; /* Espacio para el header */
+  }
+
+  .hero-text {
+    max-width: 600px;
+  }
+
+  .hero-title {
+    font-family: var(--font-titles);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--color-black);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title .highlight {
+    font-style: italic;
+    color: var(--color-gray-medium);
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--color-gray-medium);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-cta {
+    font-size: 0.875rem;
+  }
+
+  /* Indicador de scroll */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1;
+  }
+
+  .scroll-text {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-gray-light);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-gray-light) 0%,
+      transparent 100%
+    );
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scaleY(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scaleY(1.2);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-content {
+      padding: 0 1.5rem;
+      padding-top: 100px;
+    }
+
+    .hero-overlay {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0.7) 100%
+      );
+    }
+
+    .hero-text {
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .hero-parallax-bg {
+      background-attachment: scroll;
+    }
+
+    .scroll-indicator {
+      bottom: 2rem;
+    }
+  }
+
+  /* Deshabilitar parallax si el usuario prefiere movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-parallax-bg {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Efecto Parallax
+  const parallaxBg = document.getElementById('parallax-bg');
+  
+  if (parallaxBg) {
+    let ticking = false;
+    
+    function updateParallax() {
+      if (!parallaxBg) return;
+      
+      const scrolled = window.pageYOffset;
+      const heroElement = document.querySelector('.hero') as HTMLElement | null;
+      const heroHeight = heroElement?.offsetHeight || 0;
+      
+      // Solo aplicar parallax mientras el hero sea visible
+      if (scrolled <= heroHeight) {
+        const yPos = scrolled * 0.5; // Factor de velocidad del parallax
+        parallaxBg.style.transform = `translate3d(0, ${yPos}px, 0)`;
+      }
+      
+      ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+</script>
