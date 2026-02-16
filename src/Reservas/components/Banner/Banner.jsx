@@ -1,10 +1,10 @@
 import React from 'react';
 import defaultBannerImage from '../../../assets/image_field.jpg';
-
+import fondoFut from '../../../assets/fondo_fut.jpeg';
 const Banner = ({ 
   title = "Canchas El Golazo",
   subtitle = "Las mejores canchas sintéticas de la ciudad",
-  backgroundImage = null,
+  backgroundImage = fondoFut || defaultBannerImage,
   showCTA = true,
   ctaText = "Reserva Ahora",
   onCtaClick = () => {}

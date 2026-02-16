@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useReservas } from '../context/ReservasContext';
 import Banner from '../components/Banner';
@@ -9,7 +10,9 @@ const ReservasLanding = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen relative">
+      {/* Fondo Parallax */}
+      <div className="reservas-parallax-bg" aria-hidden="true"></div>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm">
         <div className="max-w-[1200px] mx-auto px-4">

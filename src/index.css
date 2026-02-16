@@ -1,4 +1,31 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+/* Parallax para fondo de reservas */
+.reservas-parallax-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  background-image: url('./assets/fondo_fut.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  will-change: background-position;
+  animation: reservasParallaxMove 30s linear infinite alternate;
+  opacity: 0.35;
+}
+
+@keyframes reservasParallaxMove {
+  0% {
+    background-position: center 0px;
+  }
+  100% {
+    background-position: center 120px;
+  }
+}
 
 @tailwind utilities;
 

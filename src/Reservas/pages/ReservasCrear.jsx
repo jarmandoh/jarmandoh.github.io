@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import fondoFut from '../../assets/fondo_fut.jpeg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useReservas } from '../context/ReservasContext';
 import ReservationForm from '../components/ReservationForm';
@@ -14,7 +15,9 @@ const ReservasCrear = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Fondo Parallax */}
+      <div className="reservas-parallax-bg" aria-hidden="true"></div>
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm">
         <div className="max-w-[1200px] mx-auto px-4">

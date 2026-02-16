@@ -45,7 +45,7 @@ const CourtCard = ({
           <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500 z-10"></div>
           
           <img 
-            src={court.images?.[0] || defaultCourtImage} 
+            src={defaultCourtImage} 
             alt={court.name}
             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
           />
@@ -59,17 +59,7 @@ const CourtCard = ({
             <span>{courtType.name}</span>
           </div>
 
-          {/* Status Badge */}
-          {court.isActive !== undefined && (
-            <div className={`absolute bottom-3 left-3 z-10 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg ${
-              court.isActive 
-                ? 'bg-linear-to-r from-sky-500 to-sky-600 text-white' 
-                : 'bg-linear-to-r from-red-500 to-red-600 text-white'
-            }`}>
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-              {court.isActive ? 'Disponible' : 'No disponible'}
-            </div>
-          )}
+        
 
           {/* Diagonal Accent Line */}
           <div className="absolute bottom-0 right-0 w-32 h-1 bg-linear-to-l from-amber-400 to-transparent transform origin-right group-hover:w-48 transition-all duration-500"></div>
