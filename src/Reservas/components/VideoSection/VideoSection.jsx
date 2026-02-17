@@ -76,14 +76,16 @@ const VideoSection = ({
                   </div>
                 )}
                 <iframe
-                  src={getEmbedUrl(videoUrl)}
+                  src={getEmbedUrl(videoUrl) + (getEmbedUrl(videoUrl).includes('?') ? '&' : '?') + 'controls=0&mute=1&autoplay=1&loop=1&playlist=' + getEmbedUrl(videoUrl).split('/').slice(-1)[0]}
                   title="Video de presentación"
                   className="absolute inset-0 w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
                   onLoad={() => setIsVideoLoaded(true)}
+                  tabIndex="-1"
+                  style={{ pointerEvents: 'none' }}
                 ></iframe>
+                {/* <iframe width="560" height="315" src="https://www.youtube.com/embed/gg7AglK4aIY?si=mbFw3EzRoM6APzb-&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> */}
               </div>
 
               {/* Bottom gradient overlay */}

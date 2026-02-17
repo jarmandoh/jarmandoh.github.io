@@ -337,6 +337,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
                   court={court}
                   isSelected={selectedCourt?.id === court.id}
                   onSelect={handleSelectCourt}
+                  compact={true}
                 />
               ))}
             </div>

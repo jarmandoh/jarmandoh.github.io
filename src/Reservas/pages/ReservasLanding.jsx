@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useReservas } from '../context/ReservasContext';
 import Banner from '../components/Banner';
 import VideoSection from '../components/VideoSection';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 
 const ReservasLanding = () => {
   const { settings } = useReservas();
@@ -114,10 +115,11 @@ const ReservasLanding = () => {
 
       {/* Video Section */}
       <VideoSection 
-        videoUrl="https://www.youtube.com/embed/kgL5_HRG5qE"
+        videoUrl="https://www.youtube.com/watch?v=gg7AglK4aIY"
         title="Conoce Nuestras Instalaciones"
         description="Mira por qué somos la opción preferida para jugar fútbol en la ciudad"
         maxWidth="1200px"
+        
       />
 
       {/* CTA - Ver Canchas + Reservar */}
@@ -555,6 +557,7 @@ const ReservasLanding = () => {
           </div>
         </div>
       </footer>
+      <ScrollToTopButton />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useReservas } from '../context/ReservasContext';
 import { COURT_TYPES, DAYS_OF_WEEK, TIME_SLOT_CATEGORIES } from '../data/courtsConfig';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 
 const ReservasAdmin = () => {
   const { 
@@ -1191,6 +1192,7 @@ const ReservasAdmin = () => {
           </div>
         </div>
       )}
+      <ScrollToTopButton />
     </div>
   );
 };

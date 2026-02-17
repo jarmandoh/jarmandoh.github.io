@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useReservas } from '../context/ReservasContext';
 import CourtCard from '../components/CourtCard';
 import { COURT_TYPES } from '../data/courtsConfig';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 
 const ReservasCanchas = () => {
   const { courts, settings } = useReservas();
@@ -198,6 +199,7 @@ const ReservasCanchas = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&display=swap');
       `}</style>
+      <ScrollToTopButton />
     </div>
   );
 };

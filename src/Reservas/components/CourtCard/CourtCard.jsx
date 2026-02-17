@@ -15,18 +15,10 @@ const CourtCard = ({
   return (
     <div 
       onClick={() => onSelect?.(court)}
-      className={`
-        group relative bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg 
-        transition-all duration-500 cursor-pointer
-        ${isSelected 
-          ? 'ring-4 ring-sky-500 shadow-2xl shadow-sky-500/30 transform scale-[1.02]' 
-          : 'hover:shadow-2xl hover:transform hover:scale-[1.03] hover:-translate-y-2'
-        }
-        ${compact ? 'p-4' : ''}
-      `}
+      className={`relative bg-gray-50 dark:bg-white/10 rounded-3xl overflow-hidden shadow-lg cursor-pointer ${isSelected ? 'ring-4 ring-sky-500 shadow-2xl shadow-sky-500/30 scale-[1.02]' : ''} ${compact ? 'p-4' : ''}`}
     >
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 bg-linear-to-br from-sky-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      {/* Fondo decorativo (sin animación de hover) */}
+      <div className="absolute inset-0 bg-linear-to-br from-sky-500/5 to-amber-500/5 opacity-0"></div>
 
       {/* Selected Badge */}
       {isSelected && (
@@ -42,16 +34,16 @@ const CourtCard = ({
       {!compact && (
         <div className="relative h-48 md:h-56 bg-linear-to-br from-sky-700 to-sky-900 overflow-hidden">
           {/* Hover Overlay Effect */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500 z-10"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 z-10"></div>
           
           <img 
             src={defaultCourtImage} 
             alt={court.name}
-            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover"
           />
           
           {/* Decorative Corner Shape */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-amber-400/30 to-transparent transform rotate-45 translate-x-12 -translate-y-12 group-hover:scale-150 transition-transform duration-500"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-amber-400/30 to-transparent transform rotate-45 translate-x-12 -translate-y-12"></div>
 
           {/* Court Type Badge */}
           <div className="absolute top-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-white/20">
@@ -72,7 +64,7 @@ const CourtCard = ({
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 
-              className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300"
+              className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1"
               style={{ fontFamily: "'Exo 2', sans-serif" }}
             >
               {court.name}
@@ -108,11 +100,11 @@ const CourtCard = ({
         {/* Dimensions & Players */}
         {showDetails && (
           <div className="flex items-center gap-4 mb-4 text-sm">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30 transition-colors">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <span className="text-lg">📐</span>
               <span className="font-semibold text-gray-700 dark:text-gray-300">{courtType.dimensions}</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg group-hover:bg-sky-100 dark:group-hover:bg-sky-900/30 transition-colors">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <span className="text-lg">👥</span>
               <span className="font-semibold text-gray-700 dark:text-gray-300">{courtType.playersPerTeam}v{courtType.playersPerTeam}</span>
             </div>
@@ -125,7 +117,7 @@ const CourtCard = ({
             {court.amenities.slice(0, compact ? 2 : 4).map((amenity, index) => (
               <span 
                 key={index}
-                className="px-2.5 py-1 bg-linear-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-600 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 group-hover:border-sky-300 dark:group-hover:border-sky-600 transition-colors"
+                className="px-2.5 py-1 bg-linear-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-600 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
               >
                 {amenity}
               </span>
@@ -139,9 +131,7 @@ const CourtCard = ({
         )}
 
         {/* Hover Action Indicator */}
-        {!isSelected && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-sky-500 via-amber-400 to-sky-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-b-3xl"></div>
-        )}
+        {/* Sin animación de hover en la línea inferior */}
       </div>
 
       <style>{`
