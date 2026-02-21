@@ -497,35 +497,57 @@ const ReservasLanding = () => {
 
               {/* Contact Form */}
               <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl">
-                <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-5" style={{ fontFamily: "'Exo 2', sans-serif" }}>
+                <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-5" style={{ fontFamily: "'Exo 2', sans-serif" }} id="contact-form-title">
                   Envíanos un mensaje
                 </h3>
-                <form className="space-y-4">
+                <form className="space-y-4" aria-labelledby="contact-form-title" role="form">
                   <div>
+                    <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Nombre
+                    </label>
                     <input
+                      id="contact-name"
+                      name="name"
                       type="text"
                       placeholder="Tu nombre"
                       className="w-full px-4 py-3.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl focus:ring-2 focus:ring-sky-500 dark:text-white text-sm font-medium transition-all"
+                      aria-label="Nombre"
+                      required
                     />
                   </div>
                   <div>
+                    <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Email
+                    </label>
                     <input
+                      id="contact-email"
+                      name="email"
                       type="email"
                       placeholder="Tu email"
                       className="w-full px-4 py-3.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl focus:ring-2 focus:ring-sky-500 dark:text-white text-sm font-medium transition-all"
+                      aria-label="Correo electrónico"
+                      required
                     />
                   </div>
                   <div>
+                    <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Mensaje
+                    </label>
                     <textarea
+                      id="contact-message"
+                      name="message"
                       placeholder="Tu mensaje"
                       rows={4}
                       className="w-full px-4 py-3.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl focus:ring-2 focus:ring-sky-500 dark:text-white resize-none text-sm font-medium transition-all"
+                      aria-label="Mensaje"
+                      required
                     ></textarea>
                   </div>
                   <button
                     type="submit"
                     className="w-full py-4 bg-linear-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-base"
                     style={{ fontFamily: "'Exo 2', sans-serif" }}
+                    aria-label="Enviar Mensaje"
                   >
                     Enviar Mensaje ✉️
                   </button>

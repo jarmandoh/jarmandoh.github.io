@@ -125,8 +125,8 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
     setSelectedCourt(court);
     setSelectedSlots([]);
     setAvailableSlots([]);
-    // Auto-avanzar al paso 2 tras seleccionar cancha
-    setTimeout(() => goToStep(2), 450);
+    // Auto-avanzar al paso 2 tras seleccionar cancha, sin delay artificial
+    goToStep(2);
   };
 
   // Manejar cambio de fecha
@@ -171,9 +171,9 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
   const goToStep = (newStep) => {
     setStep(newStep);
     // Scroll suave al formulario al cambiar de paso
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    });
   };
 
   // Generar los próximos días disponibles para el selector visual
@@ -274,10 +274,11 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
       </div>
 
       {/* Form Content */}
-      <div className={`p-4 sm:p-6 ${fullPage ? 'flex-1 overflow-y-auto' : ''}`}>
+      <div className={`p-4 sm:p-6 ${fullPage ? 'flex-1 overflow-y-auto' : ''}`}
+        style={{ transition: 'min-height 0.3s cubic-bezier(.4,0,.2,1)' }}>
         {/* Step 1: Seleccionar Cancha */}
         {step === 1 && (
-          <div className="animate-[fadeIn_0.5s_ease-out]">
+          <div className="animate-fadeIn">
             <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3" style={{ fontFamily: "'Exo 2', sans-serif" }}>
               Selecciona tu cancha
             </h3>
@@ -355,7 +356,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
 
         {/* Step 2: Seleccionar Fecha y Hora */}
         {step === 2 && (
-          <div className="animate-[fadeIn_0.5s_ease-out]">
+          <div className="animate-fadeIn">
             <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3" style={{ fontFamily: "'Exo 2', sans-serif" }}>
               Elige fecha y horario
             </h3>
@@ -456,7 +457,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
 
         {/* Step 3: Datos del Cliente */}
         {step === 3 && (
-          <div>
+          <div className="animate-fadeIn">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Completa tu reserva
             </h3>
@@ -645,7 +646,10 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&display=swap');
-        
+
+        .animate-fadeIn {
+          animation: fadeIn 0.35s cubic-bezier(.4,0,.2,1);
+        }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
@@ -665,7 +669,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
       {/* Toast Notification */}
       {toast && (
         <div 
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-lg"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-[92%] max-w-lg"
           style={{ animation: 'toastSlideIn 0.35s ease-out forwards' }}
         >
           <div className="bg-linear-to-r from-sky-600 to-sky-700 dark:from-sky-700 dark:to-sky-800 text-white px-5 py-4 rounded-2xl shadow-2xl shadow-sky-500/30 flex items-start gap-3 border border-sky-400/30">
