@@ -40,84 +40,6 @@ const Navbar = () => {
     { label: 'Contacto', id: 'contacto' },
   ];
 
-  // Mejorar contraste y accesibilidad visual
-  const navLinkClass =
-    'block px-4 py-2 text-lg font-semibold text-white hover:text-indigo-300 focus:text-indigo-400 focus:outline-none transition-colors duration-200';
-
-  return (
-    <nav
-      className="bg-gray-900 fixed w-full z-50 shadow-lg"
-      role="navigation"
-      aria-label="Menú principal"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-        <a
-          href="#acerca"
-          className="text-2xl font-bold text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          aria-label="Ir a sección Acerca"
-        >
-          JH
-        </a>
-        <button
-          className="md:hidden text-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={isOpen}
-          aria-controls="menu-mobile"
-          onClick={toggleMenu}
-        >
-          <FontAwesomeIcon icon={isOpen ? faTimes : faBars} size="lg" />
-        </button>
-        <ul className="hidden md:flex space-x-8" role="menubar">
-          {navLinks.map(link => (
-            <li key={link.id} role="none">
-              <a
-                href={`#${link.id}`}
-                className={navLinkClass}
-                role="menuitem"
-                tabIndex={0}
-                aria-label={`Ir a sección ${link.label}`}
-                onClick={e => handleSmoothScroll(e, link.id)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') handleSmoothScroll(e, link.id);
-                }}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {/* Menú móvil */}
-      <div
-        id="menu-mobile"
-        className={`md:hidden fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center transition-transform duration-300 ${isOpen ? 'translate-y-0' : '-translate-y-full'} ${isClosing ? 'opacity-0' : 'opacity-100'}`}
-        style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-        aria-hidden={!isOpen}
-      >
-        <ul className="space-y-8" role="menubar">
-          {navLinks.map(link => (
-            <li key={link.id} role="none">
-              <a
-                href={`#${link.id}`}
-                className={navLinkClass}
-                role="menuitem"
-                tabIndex={isOpen ? 0 : -1}
-                aria-label={`Ir a sección ${link.label}`}
-                onClick={e => handleSmoothScroll(e, link.id)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') handleSmoothScroll(e, link.id);
-                }}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
-  );
-}
-
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md w-full" role="navigation" aria-label="Navegación principal">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-16">
@@ -217,6 +139,5 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
-
+}
 export default Navbar;
