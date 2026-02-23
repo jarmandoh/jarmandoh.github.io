@@ -121,7 +121,7 @@ const GameBoard = React.memo(({
       )}
     </div>
   );
-};
+});
 
 const BettingControls = ({ playerChips, onBet, hasPlacedBet }) => {
   const [betAmount, setBetAmount] = useState(10);

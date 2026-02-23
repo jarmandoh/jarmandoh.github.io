@@ -44,7 +44,7 @@ const AdminLogin = React.memo(({ onLogin }) => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+});
 
 export default AdminLogin;

@@ -108,6 +108,6 @@ const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
       </div>
     </div>
   );
-};
+});
 
 export default CreateRoomModal;

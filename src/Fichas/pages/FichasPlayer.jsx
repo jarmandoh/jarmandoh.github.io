@@ -141,6 +141,6 @@ const FichasPlayer = React.memo(() => {
       </main>
     </div>
   );
-};
+});
 
 export default FichasPlayer;

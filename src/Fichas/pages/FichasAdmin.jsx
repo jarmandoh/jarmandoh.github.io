@@ -154,6 +154,6 @@ const FichasAdmin = React.memo(() => {
       />
     </div>
   );
-};
+});
 
 export default FichasAdmin;

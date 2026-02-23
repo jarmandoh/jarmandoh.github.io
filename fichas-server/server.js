@@ -1,3 +1,14 @@
+
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import http from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import process from 'process';
+
+const app = express();
+const server = http.createServer(app);
+
 // Ruta de login para obtener un token JWT (ejemplo básico)
 app.use(express.json());
 app.post('/login', (req, res) => {
@@ -11,15 +22,6 @@ app.post('/login', (req, res) => {
   const token = jwt.sign(user, JWT_SECRET, { expiresIn: '2h' });
   res.json({ token, user });
 });
-import express from 'express';
-import jwt from 'jsonwebtoken';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
-import process from 'process';
-
-const app = express();
-const server = http.createServer(app);
 
 // Clave secreta para JWT (en producción usar variable de entorno)
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto123';

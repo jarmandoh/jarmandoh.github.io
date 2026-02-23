@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useFichasSocket } from '../context/SocketContext';
 
 export const useSocket = () => {
-  const { socket, connected } = useFichasSocket();
+  const fichasSocket = useFichasSocket();
+  const socket = fichasSocket && fichasSocket.socket !== undefined ? fichasSocket.socket : fichasSocket;
+  const connected = fichasSocket && fichasSocket.connected !== undefined ? fichasSocket.connected : false;
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [gameState, setGameState] = useState(null);
@@ -73,6 +75,8 @@ export const useSocket = () => {
   const getRooms = () => {
     socket?.emit('get-rooms');
   };
+
+  const clearError = () => setError('');
 
   return {
     socket,
