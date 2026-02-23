@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useReservas } from '../../context/ReservasContext';
 import CourtCard from '../CourtCard';
 import TimeSlotPicker from '../TimeSlotPicker';
 
-const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
+const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) => {
   const { courts, getAvailableSlots, createReservation, settings, formatPrice } = useReservas();
   const formRef = useRef(null);
   
@@ -26,20 +26,20 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
   const [filterType, setFilterType] = useState('all');
 
   // Obtener fecha mínima (hoy o mañana según la hora)
-  const getMinDate = () => {
+  const getMinDate = useCallback(() => {
     const now = new Date();
     const minAdvanceHours = settings?.minAdvanceHours || 2;
     now.setHours(now.getHours() + minAdvanceHours);
     return now.toISOString().split('T')[0];
-  };
+  }, [settings]);
 
   // Obtener fecha máxima
-  const getMaxDate = () => {
+  const getMaxDate = useCallback(() => {
     const max = new Date();
     const maxAdvanceDays = settings?.maxAdvanceDays || 30;
     max.setDate(max.getDate() + maxAdvanceDays);
     return max.toISOString().split('T')[0];
-  };
+  }, [settings]);
 
   // Cargar horarios cuando cambia la cancha o fecha
   useEffect(() => {
@@ -64,38 +64,34 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
     : activeCourts.filter(c => c.type === filterType);
 
   // Validar datos del cliente
-  const validateCustomerData = () => {
+  const validateCustomerData = useCallback(() => {
     const newErrors = {};
-    
     if (!customerData.fullName.trim()) {
       newErrors.fullName = 'El nombre es requerido';
     }
-    
     if (!customerData.email.trim()) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(customerData.email)) {
       newErrors.email = 'Email inválido';
     }
-    
     if (!customerData.phone.trim()) {
       newErrors.phone = 'El teléfono es requerido';
     } else if (!/^\+?[\d\s-]{7,15}$/.test(customerData.phone)) {
       newErrors.phone = 'Teléfono inválido';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [customerData]);
 
   // Mostrar toast con auto-dismiss
-  const showToast = (message) => {
+  const showToast = useCallback((message) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast(message);
     toastTimeoutRef.current = setTimeout(() => setToast(null), 6000);
-  };
+  }, []);
 
   // Manejar toggle de slot (multi-selección libre)
-  const handleToggleSlot = (slot) => {
+  const handleToggleSlot = useCallback((slot) => {
     setSelectedSlots(prev => {
       const isAlreadySelected = prev.some(s => s.startTime === slot.startTime);
       let newSlots;
@@ -118,29 +114,27 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
       }
       return newSlots;
     });
-  };
+  }, [formatPrice, showToast]);
 
   // Manejar selección de cancha
-  const handleSelectCourt = (court) => {
+  const handleSelectCourt = useCallback((court) => {
     setSelectedCourt(court);
     setSelectedSlots([]);
     setAvailableSlots([]);
     // Auto-avanzar al paso 2 tras seleccionar cancha, sin delay artificial
     goToStep(2);
-  };
+  }, [goToStep]);
 
   // Manejar cambio de fecha
-  const handleDateChange = (e) => {
+  const handleDateChange = useCallback((e) => {
     setSelectedDate(e.target.value);
     setSelectedSlots([]);
-  };
+  }, []);
 
   // Manejar envío del formulario
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!validateCustomerData()) return;
-    
     setSubmitting(true);
-    
     try {
       const sortedSlots = [...selectedSlots].sort((a, b) => a.startTime.localeCompare(b.startTime));
       const totalPrice = sortedSlots.reduce((sum, s) => sum + (s.price || 0), 0);
@@ -154,7 +148,6 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
         totalPrice,
         hoursCount: sortedSlots.length
       });
-
       if (result.success) {
         onSuccess?.(result.reservation);
       } else {
@@ -165,7 +158,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [validateCustomerData, selectedSlots, createReservation, selectedCourt, selectedDate, customerData, onSuccess]);
 
   // Navegar entre pasos
   const goToStep = (newStep) => {
@@ -669,7 +662,7 @@ const ReservationForm = ({ onSuccess, onCancel, fullPage = false }) => {
       {/* Toast Notification */}
       {toast && (
         <div 
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-[92%] max-w-lg"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-999 w-[92%] max-w-lg"
           style={{ animation: 'toastSlideIn 0.35s ease-out forwards' }}
         >
           <div className="bg-linear-to-r from-sky-600 to-sky-700 dark:from-sky-700 dark:to-sky-800 text-white px-5 py-4 rounded-2xl shadow-2xl shadow-sky-500/30 flex items-start gap-3 border border-sky-400/30">

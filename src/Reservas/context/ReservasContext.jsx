@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SAMPLE_COURTS, COURT_TYPES, generateTimeSlots, DEFAULT_OPERATING_HOURS, formatPrice, getTimeSlotCategory } from '../data/courtsConfig';
 
-const ReservasContext = createContext();
+const CourtsContext = createContext([]);
+const ReservationsContext = createContext([]);
+const SettingsContext = createContext({});
+const AdminContext = createContext(null);
+const LoadingContext = createContext(true);
 
-// Simular datos de localStorage para persistencia
 const STORAGE_KEYS = {
   COURTS: 'reservas_courts',
   RESERVATIONS: 'reservas_reservations',
@@ -11,7 +14,6 @@ const STORAGE_KEYS = {
   SETTINGS: 'reservas_settings'
 };
 
-// Datos iniciales de configuración
 const initialSettings = {
   businessName: 'Canchas El Golazo',
   businessAddress: 'Calle 123 #45-67, Bogotá',
@@ -26,6 +28,12 @@ const initialSettings = {
   maxAdvanceDays: 30,
   depositPercentage: 30
 };
+
+export const useCourts = () => useContext(CourtsContext);
+export const useReservations = () => useContext(ReservationsContext);
+export const useSettings = () => useContext(SettingsContext);
+export const useAdmin = () => useContext(AdminContext);
+export const useLoading = () => useContext(LoadingContext);
 
 export const ReservasProvider = ({ children }) => {
   const [courts, setCourts] = useState([]);
@@ -45,28 +53,20 @@ export const ReservasProvider = ({ children }) => {
 
         if (storedCourts) {
           setCourts(JSON.parse(storedCourts));
-        } else {
-          // Inicializar con datos de ejemplo
-          const initialCourts = SAMPLE_COURTS.map(court => ({
-            ...court,
-            operatingHours: Array(7).fill(null).map((_, dayIndex) => ({
-              dayOfWeek: dayIndex,
-              openTime: DEFAULT_OPERATING_HOURS.openTime,
-              closeTime: DEFAULT_OPERATING_HOURS.closeTime,
-              isOpen: true
-            })),
-            pricing: Object.keys(COURT_TYPES).reduce((acc, typeKey) => {
-              const type = COURT_TYPES[typeKey];
-              if (type.id === court.type) {
-                acc.basePrice = type.defaultPrice;
-              }
-              return acc;
-            }, { basePrice: 80000 }),
-            customPricing: []
-          }));
-          setCourts(initialCourts);
-          localStorage.setItem(STORAGE_KEYS.COURTS, JSON.stringify(initialCourts));
-        }
+        return (
+          <CourtsContext.Provider value={courts}>
+            <ReservationsContext.Provider value={reservations}>
+              <SettingsContext.Provider value={settings}>
+                <AdminContext.Provider value={admin}>
+                  <LoadingContext.Provider value={loading}>
+                    {children}
+                  </LoadingContext.Provider>
+                </AdminContext.Provider>
+              </SettingsContext.Provider>
+            </ReservationsContext.Provider>
+          </CourtsContext.Provider>
+        );
+      };
 
         if (storedReservations) {
           setReservations(JSON.parse(storedReservations));

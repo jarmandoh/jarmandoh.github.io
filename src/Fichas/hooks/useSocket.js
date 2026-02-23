@@ -6,6 +6,7 @@ export const useSocket = () => {
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [gameState, setGameState] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!socket) return;
@@ -28,7 +29,9 @@ export const useSocket = () => {
     });
 
     socket.on('error', (error) => {
-      console.error('Socket error:', error);
+      let msg = typeof error === 'string' ? error : error?.message || 'Error desconocido';
+      setError(msg);
+      console.error('Socket error:', msg);
     });
 
     return () => {
@@ -38,6 +41,8 @@ export const useSocket = () => {
       socket.off('game-state-updated');
       socket.off('error');
     };
+    // Limpiar error manualmente
+    const clearError = () => setError('');
   }, [socket]);
 
   // Funciones para interactuar con el servidor
@@ -75,6 +80,8 @@ export const useSocket = () => {
     rooms,
     currentRoom,
     gameState,
+    error,
+    clearError,
     createRoom,
     joinRoom,
     leaveRoom,

@@ -8,7 +8,7 @@ import './FichasGestor.css';
 const FichasGestor = () => {
   const navigate = useNavigate();
   const { logout } = useGestorAuth();
-  const { connected, rooms, createRoom, getRooms } = useSocket();
+  const { connected, rooms, createRoom, getRooms, error, clearError } = useSocket();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
@@ -36,6 +36,14 @@ const FichasGestor = () => {
           </div>
         </div>
       </header>
+
+      {/* Error global de socket */}
+      {error && (
+        <div className="global-error-message">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+        </div>
+      )}
 
       <main className="gestor-content">
         <div className="gestor-section">

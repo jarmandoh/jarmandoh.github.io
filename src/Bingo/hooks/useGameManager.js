@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 // Hook para gestionar juegos y sorteos
 export const useGameManager = () => {
@@ -12,20 +12,24 @@ export const useGameManager = () => {
   }, []);
 
   const loadGames = () => {
-    try {
-      const storedGames = localStorage.getItem(GAMES_STORAGE_KEY);
-      if (storedGames) {
-        const parsedGames = JSON.parse(storedGames);
-        setGames(parsedGames);
-        
-        // Encontrar juego activo
-        const active = parsedGames.find(game => game.status === 'active');
-        if (active) {
-          setActiveGame(active);
-        }
-      }
-    } catch (error) {
-      console.error('Error al cargar juegos:', error);
+    // Memoizar games y activeGame para evitar renders innecesarios
+    const memoizedGames = useMemo(() => games, [games]);
+    const memoizedActiveGame = useMemo(() => activeGame, [activeGame]);
+
+    return {
+      games: memoizedGames,
+      activeGame: memoizedActiveGame,
+      createGame,
+      startGame,
+      finishGame,
+      updateGameState,
+      addCalledNumber,
+      setActiveGame,
+      getGameById,
+      updateGame,
+      deleteGame,
+      setGames
+    };
     }
   };
 

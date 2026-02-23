@@ -1,43 +1,71 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useRef, useState, useEffect, useContext } from 'react';
 
-export const SocketContext = createContext();
+const MockSocketRefContext = createContext(null);
+const BingoConnectionStatusContext = createContext(false);
+
+export const useBingoSocket = () => useContext(MockSocketRefContext);
+export const useBingoConnectionStatus = () => useContext(BingoConnectionStatusContext);
 
 export const SocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+  const mockSocketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Usar BroadcastChannel para comunicación entre pestañas
     const channel = new BroadcastChannel('bingo_game_channel');
-
-    const mockSocket = {
+    // Solo inicializa una vez
+    mockSocketRef.current = {
       _listeners: {},
-      connected: true, // Propiedad para verificar conexión
-      id: `socket_${Date.now()}`, // ID único del socket
-
+      connected: true,
+      id: `socket_${Date.now()}`,
       emit: (event, data, callback) => {
         console.log('Socket emit:', event, data);
-        
-        // Enviar a otras pestañas
         channel.postMessage({ type: event, data });
-
-        // También disparar localmente para sincronización inmediata
         setTimeout(() => {
-          mockSocket._trigger(event, data);
+          mockSocketRef.current._trigger(event, data);
         }, 0);
-
-        // Ejecutar callback si existe (para acknowledgments)
         if (typeof callback === 'function') {
           setTimeout(() => {
             callback({ success: true });
           }, 10);
         }
       },
-
       on: (event, callback) => {
         console.log('Socket listening for:', event);
-        if (!mockSocket._listeners[event]) {
-          mockSocket._listeners[event] = [];
+        if (!mockSocketRef.current._listeners[event]) {
+          mockSocketRef.current._listeners[event] = [];
+        }
+        mockSocketRef.current._listeners[event].push(callback);
+      },
+      off: (event, callback) => {
+        if (!mockSocketRef.current._listeners[event]) return;
+        mockSocketRef.current._listeners[event] = mockSocketRef.current._listeners[event].filter(cb => cb !== callback);
+      },
+      _trigger: (event, data) => {
+        if (mockSocketRef.current._listeners[event]) {
+          mockSocketRef.current._listeners[event].forEach(cb => cb(data));
+        }
+      }
+    };
+    setIsConnected(true);
+    channel.onmessage = ({ data }) => {
+      if (data && data.type) {
+        mockSocketRef.current._trigger(data.type, data.data);
+      }
+    };
+    return () => {
+      channel.close();
+      setIsConnected(false);
+    };
+  }, []);
+
+  return (
+    <MockSocketRefContext.Provider value={mockSocketRef.current}>
+      <BingoConnectionStatusContext.Provider value={isConnected}>
+        {children}
+      </BingoConnectionStatusContext.Provider>
+    </MockSocketRefContext.Provider>
+  );
+};
         }
         mockSocket._listeners[event].push(callback);
 

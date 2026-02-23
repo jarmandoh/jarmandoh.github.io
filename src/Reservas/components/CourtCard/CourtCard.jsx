@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { COURT_TYPES } from '../../data/courtsConfig';
 import defaultCourtImage from '../../../assets/cancha_01.jpg';
 
-const CourtCard = ({ 
+const CourtCard = React.memo(({ 
   court, 
   onSelect, 
   isSelected = false,
@@ -12,9 +12,13 @@ const CourtCard = ({
 }) => {
   const courtType = COURT_TYPES[court.type?.toUpperCase()?.replace('-', '_')] || COURT_TYPES.FUTBOL_5;
 
+  const handleSelect = useCallback(() => {
+    onSelect?.(court);
+  }, [onSelect, court]);
+
   return (
     <div 
-      onClick={() => onSelect?.(court)}
+      onClick={handleSelect}
       className={`relative bg-gray-50 dark:bg-white/10 rounded-3xl overflow-hidden shadow-lg cursor-pointer ${isSelected ? 'ring-4 ring-sky-500 shadow-2xl shadow-sky-500/30 scale-[1.02]' : ''} ${compact ? 'p-4' : ''}`}
     >
       {/* Fondo decorativo (sin animación de hover) */}

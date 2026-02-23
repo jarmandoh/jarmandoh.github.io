@@ -42,7 +42,7 @@ const BingoGestorContent = () => {
     removeAssignment,
     getAssignmentsByRaffle
   } = useBingoAdmin();
-  const { socket } = useSocket();
+  const { socket, error, clearError } = useSocket();
 
   const [currentGame, setCurrentGame] = useState(null);
   const [gameStats, setGameStats] = useState({
@@ -572,6 +572,13 @@ const BingoGestorContent = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-200 via-purple-100 to-pink-200 p-4">
+      {/* Error global de socket */}
+      {error && (
+        <div className="global-error-message">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+        </div>
+      )}
       {/* Indicador de estado de conexión */}
       {socket && !socket.connected && (
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">

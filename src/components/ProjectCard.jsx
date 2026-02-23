@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-const ProjectCard = ({ title, description, tags, demoUrl, isInternal = false }) => {
+const ProjectCard = React.memo(({ title, description, tags, demoUrl, isInternal = false }) => {
+  const renderTag = useCallback((tag) => (
+    <span
+      key={tag}
+      className="bg-indigo-100 text-indigo-700 py-1 px-3 rounded-full"
+    >
+      {tag}
+    </span>
+  ), []);
+
   return (
     <div className="bg-gray-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-[1.02]">
       <h3 className="text-2xl font-semibold mb-3 text-indigo-500">{title}</h3>
       <p className="text-gray-600 mb-4">{description}</p>
       <div className="flex flex-wrap gap-2 text-sm font-medium mb-4">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="bg-indigo-100 text-indigo-700 py-1 px-3 rounded-full"
-          >
-            {tag}
-          </span>
-        ))}
+        {tags.map(renderTag)}
       </div>
       <div className="flex space-x-4">
         {demoUrl ? (
@@ -23,7 +25,7 @@ const ProjectCard = ({ title, description, tags, demoUrl, isInternal = false }) 
               to={demoUrl} 
               className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-300"
             >
-              🎮 Jugar Ahora &rarr;
+              3ae Jugar Ahora &rarr;
             </Link>
           ) : (
             <a 
@@ -44,6 +46,6 @@ const ProjectCard = ({ title, description, tags, demoUrl, isInternal = false }) 
       </div>
     </div>
   );
-};
+});
 
 export default ProjectCard;

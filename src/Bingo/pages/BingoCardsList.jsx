@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSearch, faEye } from '@fortawesome/free-solid-svg-icons';
 
-const BingoCardsList = () => {
+const BingoCardsList = React.memo(() => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -12,31 +12,33 @@ const BingoCardsList = () => {
   }, []);
   const cardsPerPage = 50;
 
-  // Generar array de números de cartones
-  const allCardNumbers = Array.from({ length: 1200 }, (_, i) => i + 1);
+  // Memoizar array de números de cartones
+  const allCardNumbers = useMemo(() => Array.from({ length: 1200 }, (_, i) => i + 1), []);
 
-  // Filtrar cartones basado en la búsqueda
-  const filteredCards = allCardNumbers.filter(cardNum => 
-    cardNum.toString().includes(searchTerm)
-  );
+  // Memoizar filtrado de cartones
+  const filteredCards = useMemo(() => {
+    if (!searchTerm) return allCardNumbers;
+    return allCardNumbers.filter(cardNum => cardNum.toString().includes(searchTerm));
+  }, [allCardNumbers, searchTerm]);
 
-  // Paginación
-  const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
-  const startIndex = (currentPage - 1) * cardsPerPage;
-  const endIndex = startIndex + cardsPerPage;
-  const currentCards = filteredCards.slice(startIndex, endIndex);
+  // Memoizar paginación
+  const totalPages = useMemo(() => Math.ceil(filteredCards.length / cardsPerPage), [filteredCards.length, cardsPerPage]);
+  const startIndex = useMemo(() => (currentPage - 1) * cardsPerPage, [currentPage, cardsPerPage]);
+  const endIndex = useMemo(() => startIndex + cardsPerPage, [startIndex, cardsPerPage]);
+  const currentCards = useMemo(() => filteredCards.slice(startIndex, endIndex), [filteredCards, startIndex, endIndex]);
 
-  const handleSearchChange = (e) => {
+  // Memoizar handlers
+  const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reiniciar a la primera página al buscar
-  };
+    setCurrentPage(1);
+  }, []);
 
-  const goToPage = (page) => {
+  const goToPage = useCallback((page) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  // Generar números de páginas para mostrar
-  const getPageNumbers = () => {
+  // Memoizar generación de números de página
+  const getPageNumbers = useCallback(() => {
     const pages = [];
     const maxPagesToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
@@ -50,7 +52,7 @@ const BingoCardsList = () => {
       pages.push(i);
     }
     return pages;
-  };
+  }, [currentPage, totalPages]);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-600 to-blue-600 p-4">

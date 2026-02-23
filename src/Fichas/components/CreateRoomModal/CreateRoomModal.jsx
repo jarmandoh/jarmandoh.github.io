@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './CreateRoomModal.css';
 import { GAME_CONFIG } from '../../data/gameConfig';
 
-const CreateRoomModal = ({ isOpen, onClose, onCreate }) => {
+const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
   const [formData, setFormData] = useState({
     name: '',
     maxPlayers: 4,

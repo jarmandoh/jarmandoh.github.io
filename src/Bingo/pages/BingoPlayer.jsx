@@ -230,7 +230,7 @@ const BingoPlayerContent = () => {
   const { player, logoutPlayer, updatePlayerCard, updatePlayerPattern } = usePlayerAuth();
   const { getGameById } = useGameManager();
   const { getAssignmentsByRaffle } = useBingoAdmin();
-  const { socket } = useSocket();
+  const { socket, error, clearError } = useSocket();
   
   const [currentGame, setCurrentGame] = useState(null);
   const [playerCard, setPlayerCard] = useState(null);
@@ -476,6 +476,13 @@ const BingoPlayerContent = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      {/* Error global de socket */}
+      {error && (
+        <div className="global-error-message">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+        </div>
+      )}
       {/* Winner Modal */}
       {showWinnerModal && winnerData && (
         <WinnerModal

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AdminLogin.css';
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = React.memo(({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 

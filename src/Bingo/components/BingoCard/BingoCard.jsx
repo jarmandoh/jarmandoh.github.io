@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSocket } from '../../hooks/useSocket';
 import './BingoCard.css';
 
-const BingoCard = ({ card, calledNumbers: initialCalledNumbers, playerName, cardNumber, gameId, winPattern, winningNumbers }) => {
+const BingoCard = React.memo(({ card, calledNumbers: initialCalledNumbers, playerName, cardNumber, gameId, winPattern, winningNumbers }) => {
   const columns = ['B', 'I', 'N', 'G', 'O'];
   const [calledNumbers, setCalledNumbers] = useState(initialCalledNumbers || []);
   const [markedNumbers, setMarkedNumbers] = useState(new Set());

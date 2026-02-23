@@ -1,7 +1,7 @@
 import React from 'react';
 import './NumberDisplay.css';
 
-const NumberDisplay = ({ currentNumber, calledNumbers }) => {
+const NumberDisplay = React.memo(({ currentNumber, calledNumbers }) => {
   const getColumnLetter = (num) => {
     if (num >= 1 && num <= 15) return 'B';
     if (num >= 16 && num <= 30) return 'I';
@@ -14,7 +14,6 @@ const NumberDisplay = ({ currentNumber, calledNumbers }) => {
   return (
     <div className="number-display">
       <h2 className="number-display__title">Número Actual</h2>
-      
       <div className="number-display__content">
         {currentNumber ? (
           <div className="number-display__current">
@@ -34,7 +33,6 @@ const NumberDisplay = ({ currentNumber, calledNumbers }) => {
           </div>
         )}
       </div>
-
       <div className="number-display__footer">
         <p className="number-display__stats">
           Cantados: <span className="number-display__stats-value">{calledNumbers.length}</span>/75
@@ -48,6 +46,6 @@ const NumberDisplay = ({ currentNumber, calledNumbers }) => {
       </div>
     </div>
   );
-};
+});
 
 export default NumberDisplay;

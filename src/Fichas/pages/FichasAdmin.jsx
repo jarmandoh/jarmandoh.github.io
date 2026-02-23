@@ -5,10 +5,10 @@ import { useSocket } from '../hooks/useSocket';
 import CreateRoomModal from '../components/CreateRoomModal';
 import './FichasAdmin.css';
 
-const FichasAdmin = () => {
+const FichasAdmin = React.memo(() => {
   const navigate = useNavigate();
   const { logout } = useAdminAuth();
-  const { connected, rooms, createRoom, getRooms } = useSocket();
+  const { connected, rooms, createRoom, getRooms, error, clearError } = useSocket();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
@@ -36,6 +36,14 @@ const FichasAdmin = () => {
           </div>
         </div>
       </header>
+
+      {/* Error global de socket */}
+      {error && (
+        <div className="global-error-message">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+        </div>
+      )}
 
       <main className="admin-content">
         <div className="admin-section">

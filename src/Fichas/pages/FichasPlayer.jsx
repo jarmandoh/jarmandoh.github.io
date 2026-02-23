@@ -7,7 +7,7 @@ import RoomCard from '../components/RoomCard';
 import GameBoard from '../components/GameBoard';
 import './FichasPlayer.css';
 
-const FichasPlayer = () => {
+const FichasPlayer = React.memo(() => {
   const navigate = useNavigate();
   const { playerData, logout } = usePlayerAuth();
   const { 
@@ -16,7 +16,9 @@ const FichasPlayer = () => {
     currentRoom, 
     joinRoom, 
     leaveRoom,
-    getRooms 
+    getRooms,
+    error,
+    clearError
   } = useSocket();
   
   const {
@@ -79,6 +81,14 @@ const FichasPlayer = () => {
           </div>
         </div>
       </header>
+
+      {/* Mostrar error global de socket */}
+      {error && (
+        <div className="global-error-message">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+        </div>
+      )}
 
       <main className="player-content">
         {!currentRoom ? (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSocket } from './useSocket';
 import { GAME_STATES, GAME_CONFIG } from '../data/gameConfig';
 
@@ -71,14 +71,19 @@ export const useGameManager = () => {
     return gameState === GAME_STATES.DRAWING && isMyTurn(playerId);
   };
 
+  // Memoizar valores derivados
+  const memoizedPlayers = useMemo(() => players, [players]);
+  const memoizedCurrentPlayer = useMemo(() => currentPlayer, [currentPlayer]);
+  const memoizedAvailableFichas = useMemo(() => availableFichas, [availableFichas]);
+
   return {
     connected,
     currentRoom,
     gameState,
-    players,
-    currentPlayer,
+    players: memoizedPlayers,
+    currentPlayer: memoizedCurrentPlayer,
     pot,
-    availableFichas,
+    availableFichas: memoizedAvailableFichas,
     handleBet,
     handleDraw,
     handleStand,

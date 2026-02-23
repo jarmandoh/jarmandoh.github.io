@@ -26,8 +26,10 @@ import AssignmentStats from '../components/AssignmentStats';
 import GestorPasswordManager from '../components/GestorPasswordManager';
 import GameCreationModal from '../components/GameCreationModal';
 import { SocketProvider } from '../context/SocketContext';
+import { useSocket } from '../hooks/useSocket';
 
 const BingoAdmin = () => {
+  const { error, clearError } = useSocket();
   const { logout, getTimeUntilExpiry } = useAdminAuth();
   const {
     currentRaffle,
@@ -135,6 +137,13 @@ const BingoAdmin = () => {
     <SocketProvider>
       <div className="min-h-screen bg-linear-to-br from-purple-200 via-pink-100 to-blue-200 p-4">
       <div className="max-w-7xl mx-auto">
+        {/* Error global de socket */}
+        {error && (
+          <div className="global-error-message">
+            <span>{error}</span>
+            <button className="btn-close-error" onClick={clearError} title="Cerrar">✖</button>
+          </div>
+        )}
         {/* Header */}
         <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-lg">
           <div className="flex justify-between items-center mb-4">

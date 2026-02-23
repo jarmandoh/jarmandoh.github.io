@@ -1,47 +1,42 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useRef, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-export const SocketContext = createContext(null);
+const SocketRefContext = createContext(null);
+const ConnectionStatusContext = createContext(false);
 
-export const useFichasSocket = () => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error('useFichasSocket debe usarse dentro de FichasSocketProvider');
-  }
-  return context;
-};
+export const useFichasSocket = () => useContext(SocketRefContext);
+export const useFichasConnectionStatus = () => useContext(ConnectionStatusContext);
 
 export const FichasSocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Conectar al servidor de Socket.io
-    const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000', {
+    socketRef.current = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000', {
       path: '/fichas-socket',
       transports: ['websocket', 'polling'],
     });
 
-    newSocket.on('connect', () => {
+    socketRef.current.on('connect', () => {
       console.log('Conectado al servidor de Fichas');
       setConnected(true);
     });
 
-    newSocket.on('disconnect', () => {
+    socketRef.current.on('disconnect', () => {
       console.log('Desconectado del servidor de Fichas');
       setConnected(false);
     });
 
-    setSocket(newSocket);
-
     return () => {
-      newSocket.close();
+      socketRef.current?.close();
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, connected }}>
-      {children}
-    </SocketContext.Provider>
+    <SocketRefContext.Provider value={socketRef.current}>
+      <ConnectionStatusContext.Provider value={connected}>
+        {children}
+      </ConnectionStatusContext.Provider>
+    </SocketRefContext.Provider>
   );
 };

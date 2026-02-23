@@ -1,4 +1,18 @@
+// Ruta de login para obtener un token JWT (ejemplo básico)
+app.use(express.json());
+app.post('/login', (req, res) => {
+  const { username, password, role } = req.body;
+  // Validación simulada (en producción, validar contra base de datos)
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Usuario y contraseña requeridos' });
+  }
+  // Simulación de autenticación exitosa
+  const user = { username, role: role || 'player' };
+  const token = jwt.sign(user, JWT_SECRET, { expiresIn: '2h' });
+  res.json({ token, user });
+});
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -7,8 +21,28 @@ import process from 'process';
 const app = express();
 const server = http.createServer(app);
 
+// Clave secreta para JWT (en producción usar variable de entorno)
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto123';
+
 // Configurar CORS
 app.use(cors());
+
+// Middleware de autenticación JWT para rutas HTTP
+function authenticateJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.status(403).json({ message: 'Token inválido o expirado' });
+      }
+      req.user = user;
+      next();
+    });
+  } else {
+    res.status(401).json({ message: 'No autenticado' });
+  }
+}
 
 // Configurar Socket.io con CORS
 const io = new Server(server, {
@@ -18,6 +52,21 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
     credentials: true
   }
+});
+
+// Middleware de autenticación para conexiones de socket.io
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+  if (!token) {
+    return next(new Error('Token de autenticación requerido'));
+  }
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return next(new Error('Token inválido o expirado'));
+    }
+    socket.user = user;
+    next();
+  });
 });
 
 // Estado del juego
@@ -50,8 +99,9 @@ function shuffleArray(array) {
   return shuffled;
 }
 
+
 io.on('connection', (socket) => {
-  console.log('Usuario conectado:', socket.id);
+  console.log('Usuario conectado:', socket.id, 'Usuario:', socket.user?.username || 'desconocido');
 
   // Obtener todas las salas
   socket.on('get-rooms', () => {
@@ -345,12 +395,14 @@ function resetGame(room) {
   io.to(room.id).emit('pot-updated', room.pot);
 }
 
-// Ruta de prueba
-app.get('/', (req, res) => {
-  res.json({ 
+
+// Ruta protegida de prueba
+app.get('/', authenticateJWT, (req, res) => {
+  res.json({
     message: 'Servidor de Fichas a 100 funcionando',
     rooms: rooms.size,
-    socketPath: '/fichas-socket'
+    socketPath: '/fichas-socket',
+    user: req.user
   });
 });
 

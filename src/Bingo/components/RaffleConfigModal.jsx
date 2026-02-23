@@ -6,7 +6,7 @@ import {
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 
-const RaffleConfigModal = ({ onSave, onClose, currentConfig, raffleNumber }) => {
+const RaffleConfigModal = React.memo(({ onSave, onClose, currentConfig, raffleNumber }) => {
   const [formData, setFormData] = useState({
     winPattern: currentConfig?.winPattern || '',
     prize: currentConfig?.prize || ''

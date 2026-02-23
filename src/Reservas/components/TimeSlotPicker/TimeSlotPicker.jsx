@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-const TimeSlotPicker = ({
+const TimeSlotPicker = React.memo(({
   slots = [],
   selectedSlots = [],
   onToggleSlot,
@@ -28,7 +28,7 @@ const TimeSlotPicker = ({
   }
 
   // Verificar si un slot está seleccionado
-  const isSlotSelected = (slot) => selectedSlots.some(s => s.startTime === slot.startTime);
+  const isSlotSelected = useCallback((slot) => selectedSlots.some(s => s.startTime === slot.startTime), [selectedSlots]);
 
   // Agrupar slots por categoría (mañana, tarde, noche)
   const groupedSlots = {
@@ -46,7 +46,7 @@ const TimeSlotPicker = ({
     })
   };
 
-  const renderSlotGroup = (title, icon, groupSlots, bgColor) => {
+  const renderSlotGroup = useCallback((title, icon, groupSlots, bgColor) => {
     if (groupSlots.length === 0) return null;
 
     return (
@@ -63,11 +63,13 @@ const TimeSlotPicker = ({
           {groupSlots.map((slot, index) => {
             const isSelected = isSlotSelected(slot);
             const isAvailable = slot.isAvailable;
-
+            const handleClick = useCallback(() => {
+              if (isAvailable && !disabled) onToggleSlot?.(slot);
+            }, [isAvailable, disabled, onToggleSlot, slot]);
             return (
               <button
                 key={index}
-                onClick={() => isAvailable && !disabled && onToggleSlot?.(slot)}
+                onClick={handleClick}
                 disabled={!isAvailable || disabled}
                 className={`
                   relative p-3 rounded-xl border-2 transition-all duration-200
@@ -131,7 +133,7 @@ const TimeSlotPicker = ({
         </div>
       </div>
     );
-  };
+  }, [disabled, isSlotSelected, onToggleSlot, showPrices]);
 
   return (
     <div>
@@ -170,6 +172,6 @@ const TimeSlotPicker = ({
       {renderSlotGroup('Noche', '🌙', groupedSlots.night, 'bg-indigo-50 dark:bg-indigo-900/20')}
     </div>
   );
-};
+});
 
 export default TimeSlotPicker;

@@ -1,7 +1,7 @@
 import React from 'react';
 import './RoomCard.css';
 
-const RoomCard = ({ room, onJoin }) => {
+const RoomCard = React.memo(({ room, onJoin }) => {
   const isFull = room.players.length >= room.maxPlayers;
 
   return (
@@ -48,6 +48,6 @@ const RoomCard = ({ room, onJoin }) => {
       </button>
     </div>
   );
-};
+});
 
 export default RoomCard;

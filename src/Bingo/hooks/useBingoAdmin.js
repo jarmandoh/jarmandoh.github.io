@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 // Hook para gestionar las asignaciones de cartones
 export const useBingoAdmin = () => {
@@ -129,8 +129,24 @@ export const useBingoAdmin = () => {
     };
   }, [currentRaffle, getAssignmentsByRaffle]);
 
+  // Memoizar assignments y selectores derivados
+  const memoizedAssignments = useMemo(() => assignments, [assignments]);
+  const memoizedGetAssignmentsByRaffle = useCallback((raffleId) => {
+    return memoizedAssignments.filter(assignment => assignment.raffleId === raffleId);
+  }, [memoizedAssignments]);
+  const memoizedGetStats = useCallback(() => {
+    const currentRaffleAssignments = memoizedGetAssignmentsByRaffle(currentRaffle);
+    return {
+      total: currentRaffleAssignments.length,
+      paid: currentRaffleAssignments.filter(a => a.paid).length,
+      unpaid: currentRaffleAssignments.filter(a => !a.paid).length,
+      winners: currentRaffleAssignments.filter(a => a.winner).length,
+      available: 1200 - currentRaffleAssignments.length
+    };
+  }, [currentRaffle, memoizedGetAssignmentsByRaffle]);
+
   return {
-    assignments,
+    assignments: memoizedAssignments,
     currentRaffle,
     setCurrentRaffle,
     assignCard,
@@ -139,7 +155,7 @@ export const useBingoAdmin = () => {
     markAsWinner,
     searchAssignments,
     isCardAssigned,
-    getAssignmentsByRaffle,
-    getStats
+    getAssignmentsByRaffle: memoizedGetAssignmentsByRaffle,
+    getStats: memoizedGetStats
   };
 };

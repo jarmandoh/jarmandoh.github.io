@@ -25,17 +25,17 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contacto" className="py-20 bg-gray-900 text-white">
+    <section id="contacto" className="py-20 bg-gray-900 text-white" aria-labelledby="contacto-heading" role="region">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">¿Listo para colaborar?</h2>
+        <h2 id="contacto-heading" className="text-4xl font-bold text-center mb-12" tabIndex={0}>¿Listo para colaborar?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Formulario de Contacto */}
           <div className="bg-gray-800 p-8 rounded-xl shadow-2xl">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-500">Envíame un mensaje</h3>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Formulario de contacto">
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
-                  Nombre
+                  Nombre <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -49,7 +49,7 @@ const ContactSection = () => {
               </div>
               <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                  Email
+                  Email <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -63,7 +63,7 @@ const ContactSection = () => {
               </div>
               <div className="mb-6">
                 <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
-                  Mensaje
+                  Mensaje <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="message"
@@ -78,6 +78,7 @@ const ContactSection = () => {
               <button
                 type="submit"
                 className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-lg shadow-indigo-500/50"
+                aria-label="Enviar mensaje de contacto"
               >
                 Enviar Mensaje
               </button>
@@ -101,17 +102,17 @@ const ContactSection = () => {
               </p>
             </div>
 
-            <div className="flex space-x-6 justify-center md:justify-start">
+            <div className="flex space-x-6 justify-center md:justify-start" role="list" aria-label="Redes sociales">
               {/* LinkedIn */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300">
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="LinkedIn" role="listitem" tabIndex={0}>
                 <FontAwesomeIcon icon={faLinkedin} className="w-8 h-8" />
               </a>
               {/* GitHub */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300">
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="GitHub" role="listitem" tabIndex={0}>
                 <FontAwesomeIcon icon={faGithub} className="w-8 h-8" />
               </a>
               {/* Twitter */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300">
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="Twitter" role="listitem" tabIndex={0}>
                 <FontAwesomeIcon icon={faTwitter} className="w-8 h-8" />
               </a>
             </div>

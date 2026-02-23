@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faHome, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { generateBingoCards } from '../data/cardsGenerator';
 
-const BingoCardViewer = () => {
+const BingoCardViewer = React.memo(() => {
   const { cardId } = useParams();
-  const [allCards, setAllCards] = useState([]);
-  const [currentCard, setCurrentCard] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Memoizar generación de todos los cartones
+  const allCards = useMemo(() => generateBingoCards(), []);
+
   useEffect(() => {
-    // Generar todos los cartones al cargar el componente
-    const cards = generateBingoCards();
-    setAllCards(cards);
     setLoading(false);
   }, []);
 
@@ -23,22 +21,21 @@ const BingoCardViewer = () => {
     }
   }, [cardId]);
 
-  useEffect(() => {
-    if (!loading && allCards.length > 0) {
-      const cardNumber = parseInt(cardId);
-      if (cardNumber >= 1 && cardNumber <= 1200) {
-        const card = allCards.find(c => c.id === cardNumber);
-        setCurrentCard(card);
-      }
+  // Memoizar cálculo del cartón actual
+  const cardNumber = useMemo(() => parseInt(cardId), [cardId]);
+  const currentCard = useMemo(() => {
+    if (!loading && allCards.length > 0 && cardNumber >= 1 && cardNumber <= 1200) {
+      return allCards.find(c => c.id === cardNumber);
     }
-  }, [cardId, allCards, loading]);
+    return null;
+  }, [loading, allCards, cardNumber]);
 
   const columns = ['B', 'I', 'N', 'G', 'O'];
   const cardNumber = parseInt(cardId);
 
-  const handlePrint = () => {
+  const handlePrint = useCallback(() => {
     window.print();
-  };
+  }, []);
 
   if (loading) {
     return (

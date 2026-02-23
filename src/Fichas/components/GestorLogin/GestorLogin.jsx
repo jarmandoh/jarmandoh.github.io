@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './GestorLogin.css';
 
-const GestorLogin = ({ onLogin }) => {
+const GestorLogin = React.memo(({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './GameBoard.css';
 import { GAME_STATES } from '../../data/gameConfig';
 
-const GameBoard = ({ 
+const GameBoard = React.memo(({ 
   gameState, 
   players, 
   currentPlayer, 
