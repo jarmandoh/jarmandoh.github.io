@@ -149,6 +149,6 @@ const CourtCard = React.memo(({
       `}</style>
     </div>
   );
-};
+});
 
 export default CourtCard;

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SAMPLE_COURTS, COURT_TYPES, generateTimeSlots, DEFAULT_OPERATING_HOURS, formatPrice, getTimeSlotCategory } from '../data/courtsConfig';
 
+
+const ReservasContext = createContext();
 const CourtsContext = createContext([]);
 const ReservationsContext = createContext([]);
 const SettingsContext = createContext({});

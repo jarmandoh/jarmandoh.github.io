@@ -90,6 +90,16 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
     toastTimeoutRef.current = setTimeout(() => setToast(null), 6000);
   }, []);
 
+
+  // Navegar entre pasos
+  const goToStep = useCallback((newStep) => {
+    setStep(newStep);
+    // Scroll suave al formulario al cambiar de paso
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
   // Manejar toggle de slot (multi-selección libre)
   const handleToggleSlot = useCallback((slot) => {
     setSelectedSlots(prev => {
@@ -160,14 +170,6 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
     }
   }, [validateCustomerData, selectedSlots, createReservation, selectedCourt, selectedDate, customerData, onSuccess]);
 
-  // Navegar entre pasos
-  const goToStep = (newStep) => {
-    setStep(newStep);
-    // Scroll suave al formulario al cambiar de paso
-    requestAnimationFrame(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  };
 
   // Generar los próximos días disponibles para el selector visual
   const getNextDays = () => {
@@ -683,6 +685,6 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
       )}
     </div>
   );
-};
+});
 
 export default ReservationForm;
