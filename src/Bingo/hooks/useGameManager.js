@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 // Hook para gestionar juegos y sorteos
 export const useGameManager = () => {
@@ -7,31 +7,14 @@ export const useGameManager = () => {
 
   const GAMES_STORAGE_KEY = 'bingoGames';
 
+
+  // Cargar juegos desde localStorage al montar
   useEffect(() => {
-    loadGames();
-  }, []);
-
-  const loadGames = () => {
-    // Memoizar games y activeGame para evitar renders innecesarios
-    const memoizedGames = useMemo(() => games, [games]);
-    const memoizedActiveGame = useMemo(() => activeGame, [activeGame]);
-
-    return {
-      games: memoizedGames,
-      activeGame: memoizedActiveGame,
-      createGame,
-      startGame,
-      finishGame,
-      updateGameState,
-      addCalledNumber,
-      setActiveGame,
-      getGameById,
-      updateGame,
-      deleteGame,
-      setGames
-    };
+    const storedGames = localStorage.getItem(GAMES_STORAGE_KEY);
+    if (storedGames) {
+      setGames(JSON.parse(storedGames));
     }
-  };
+  }, []);
 
   const saveGames = (updatedGames) => {
     localStorage.setItem(GAMES_STORAGE_KEY, JSON.stringify(updatedGames));
