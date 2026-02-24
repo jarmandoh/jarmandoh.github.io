@@ -31,7 +31,6 @@ const BingoCardViewer = React.memo(() => {
   }, [loading, allCards, cardNumber]);
 
   const columns = ['B', 'I', 'N', 'G', 'O'];
-  const cardNumber = parseInt(cardId);
 
   const handlePrint = useCallback(() => {
     window.print();

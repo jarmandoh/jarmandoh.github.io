@@ -210,6 +210,6 @@ const BingoCardsList = React.memo(() => {
       </div>
     </div>
   );
-};
+});
 
 export default BingoCardsList;
