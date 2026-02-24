@@ -45,6 +45,6 @@ const GestorLogin = React.memo(({ onLogin }) => {
       </div>
     </div>
   );
-};
+});
 
 export default GestorLogin;
