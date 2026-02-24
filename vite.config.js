@@ -5,6 +5,14 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      '@components': '/src/components',
+      '@hooks': '/src/hooks',
+      '@utils': '/src/utils',
+      '@bingo': '/src/Bingo',
+    },
+  },
   build: {
     chunkSizeWarningLimit: 1000, // Aumenta el límite de advertencia a 1000 kB
     rollupOptions: {
