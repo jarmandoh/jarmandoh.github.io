@@ -179,6 +179,6 @@ const BingoCardViewer = React.memo(() => {
       `}</style>
     </div>
   );
-};
+});
 
 export default BingoCardViewer;
