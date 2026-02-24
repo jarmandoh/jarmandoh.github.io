@@ -338,6 +338,6 @@ const BingoCard = React.memo(({ card, calledNumbers: initialCalledNumbers, playe
       </div>
     </div>
   );
-};
+});
 
 export default BingoCard;

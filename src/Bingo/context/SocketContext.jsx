@@ -1,19 +1,13 @@
-import React, { createContext, useRef, useState, useEffect, useContext } from 'react';
-
-const MockSocketRefContext = createContext(null);
-const BingoConnectionStatusContext = createContext(false);
-
-export const useBingoSocket = () => useContext(MockSocketRefContext);
-export const useBingoConnectionStatus = () => useContext(BingoConnectionStatusContext);
+import React, { useState, useEffect } from 'react';
+import { SocketContext } from './SocketInstance';
 
 export const SocketProvider = ({ children }) => {
-  const mockSocketRef = useRef(null);
+  const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const channel = new BroadcastChannel('bingo_game_channel');
-    // Solo inicializa una vez
-    mockSocketRef.current = {
+    const mockSocket = {
       _listeners: {},
       connected: true,
       id: `socket_${Date.now()}`,
@@ -21,7 +15,7 @@ export const SocketProvider = ({ children }) => {
         console.log('Socket emit:', event, data);
         channel.postMessage({ type: event, data });
         setTimeout(() => {
-          mockSocketRef.current._trigger(event, data);
+          mockSocket._trigger(event, data);
         }, 0);
         if (typeof callback === 'function') {
           setTimeout(() => {
@@ -31,50 +25,15 @@ export const SocketProvider = ({ children }) => {
       },
       on: (event, callback) => {
         console.log('Socket listening for:', event);
-        if (!mockSocketRef.current._listeners[event]) {
-          mockSocketRef.current._listeners[event] = [];
-        }
-        mockSocketRef.current._listeners[event].push(callback);
-      },
-      off: (event, callback) => {
-        if (!mockSocketRef.current._listeners[event]) return;
-        mockSocketRef.current._listeners[event] = mockSocketRef.current._listeners[event].filter(cb => cb !== callback);
-      },
-      _trigger: (event, data) => {
-        if (mockSocketRef.current._listeners[event]) {
-          mockSocketRef.current._listeners[event].forEach(cb => cb(data));
-        }
-      }
-    };
-    setIsConnected(true);
-    channel.onmessage = ({ data }) => {
-      if (data && data.type) {
-        mockSocketRef.current._trigger(data.type, data.data);
-      }
-    };
-    return () => {
-      channel.close();
-      setIsConnected(false);
-    };
-  }, []);
-
-  return (
-    <MockSocketRefContext.Provider value={mockSocketRef.current}>
-      <BingoConnectionStatusContext.Provider value={isConnected}>
-        {children}
-      </BingoConnectionStatusContext.Provider>
-    </MockSocketRefContext.Provider>
-  );
-};
+        if (!mockSocket._listeners[event]) {
+          mockSocket._listeners[event] = [];
         }
         mockSocket._listeners[event].push(callback);
-
         // Disparar evento connect si ya está conectado
         if (event === 'connect' && mockSocket.connected) {
           setTimeout(() => callback(), 0);
         }
       },
-
       off: (event, callback) => {
         console.log('Socket stop listening for:', event);
         if (mockSocket._listeners[event]) {
@@ -85,7 +44,6 @@ export const SocketProvider = ({ children }) => {
           }
         }
       },
-
       _trigger: (event, data) => {
         if (mockSocket._listeners[event]) {
           mockSocket._listeners[event].forEach(cb => {
@@ -97,14 +55,12 @@ export const SocketProvider = ({ children }) => {
           });
         }
       },
-
       disconnect: () => {
         console.log('Socket disconnected');
         mockSocket.connected = false;
         mockSocket._trigger('disconnect');
         setIsConnected(false);
       },
-
       connect: () => {
         console.log('Socket connecting...');
         mockSocket.connected = true;
