@@ -11,6 +11,9 @@ import RoleCard from '../components/RoleCard';
 import { rolesConfig } from '../data/rolesConfig';
 import { GoogleGenAI } from "@google/genai";
 
+// Obtener la API key desde variable de entorno
+const GOOGLE_GENAI_API_KEY = import.meta.env.VITE_GOOGLE_GENAI_API_KEY;
+
 
 const BingoLanding = () => {
   useEffect(() => {
@@ -18,7 +21,7 @@ const BingoLanding = () => {
   }, []);
 
   // IA
-  const ai = new GoogleGenAI({apiKey: "AIzaSyChvyJMfXgeITwZ-1f1zzCRMDDOv6qOl-4"});
+  const ai = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
 
   async function consultarAI(prompt) {
     const response = await ai.models.generateContent({
