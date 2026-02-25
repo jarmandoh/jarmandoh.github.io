@@ -12,7 +12,6 @@ node_modules
 .agents
 .claude
 skills
-dist
 dist-ssr
 *.local
 
