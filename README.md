@@ -1,3 +1,23 @@
+# Vista previa local del build
+
+Para ver el build de producción localmente, ejecuta:
+
+```bash
+npm run build
+npm run serve
+```
+
+Esto iniciará un servidor en http://localhost:4173 donde podrás ver la aplicación tal como se verá en producción.
+
+# Despliegue en GitHub Pages
+
+Para publicar tu app en GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+Esto subirá el contenido del build a la rama gh-pages y tu app estará disponible en https://jarmandoh.github.io/
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
