@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import React from 'react';
 import ContactSection from '../components/ContactSection';
 
@@ -21,14 +21,16 @@ describe('ContactSection', () => {
     const email = screen.getByLabelText(/email/i);
     const mensaje = screen.getByLabelText(/^mensaje/i);
     const boton = screen.getByRole('button', { name: /enviar mensaje de contacto/i });
-    // Simula escritura
-    nombre.value = 'Juan';
-    email.value = 'juan@email.com';
-    mensaje.value = 'Hola';
-    nombre.dispatchEvent(new Event('input', { bubbles: true }));
-    email.dispatchEvent(new Event('input', { bubbles: true }));
-    mensaje.dispatchEvent(new Event('input', { bubbles: true }));
-    boton.click();
+    // Simula escritura y envío dentro de act
+    act(() => {
+      nombre.value = 'Juan';
+      email.value = 'juan@email.com';
+      mensaje.value = 'Hola';
+      nombre.dispatchEvent(new Event('input', { bubbles: true }));
+      email.dispatchEvent(new Event('input', { bubbles: true }));
+      mensaje.dispatchEvent(new Event('input', { bubbles: true }));
+      boton.click();
+    });
     expect(window.alert).toHaveBeenCalledWith(expect.stringMatching(/mensaje enviado/i));
   });
 });
