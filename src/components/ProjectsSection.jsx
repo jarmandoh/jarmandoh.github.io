@@ -16,7 +16,7 @@ const ProjectsSection = () => {
       description:
         'Juego de apuestas estilo póker con vistas individuales para cada jugador. Sistema de sincronización en tiempo real, vista de administrador y privacidad total entre jugadores.',
       tags: ['React', 'BroadcastChannel', 'Context API', 'LocalStorage'],
-      demoUrl: '/siglo/admin',
+      demoUrl: '/fichas',
       isInternal: true
     },
     {

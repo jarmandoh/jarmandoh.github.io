@@ -23,26 +23,26 @@ const ProjectCard = React.memo(({ title, description, tags, demoUrl, isInternal 
           isInternal ? (
             <Link 
               to={demoUrl} 
-              className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-300"
+              className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-300 flex items-center gap-1"
             >
-              3ae Jugar Ahora &rarr;
+              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver el proyecto
             </Link>
           ) : (
             <a 
               href={demoUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
+              className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
             >
-              Ver Demo &rarr;
+              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver el proyecto
             </a>
           )
         ) : (
           <span className="text-gray-400 font-medium">Demo próximamente</span>
         )}
-        <a href="#" className="text-gray-600 hover:text-gray-800">
+        {/* <a href="#" className="text-gray-600 hover:text-gray-800">
           GitHub &rarr;
-        </a>
+        </a> */}
       </div>
     </div>
   );
