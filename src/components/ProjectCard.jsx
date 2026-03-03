@@ -12,9 +12,9 @@ const ProjectCard = React.memo(({ title, description, tags, demoUrl, isInternal 
   ), []);
 
   return (
-    <div className="bg-gray-100 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-[1.02]">
+    <div className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform">
       <h3 className="text-2xl font-semibold mb-3 text-indigo-500">{title}</h3>
-      <p className="text-gray-600 mb-4">{description}</p>
+      <p className="text-gray-300 mb-4">{description}</p>
       <div className="flex flex-wrap gap-2 text-sm font-medium mb-4">
         {tags.map(renderTag)}
       </div>
@@ -25,7 +25,7 @@ const ProjectCard = React.memo(({ title, description, tags, demoUrl, isInternal 
               to={demoUrl} 
               className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-300 flex items-center gap-1"
             >
-              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver el proyecto
+              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver Demo
             </Link>
           ) : (
             <a 
@@ -34,7 +34,7 @@ const ProjectCard = React.memo(({ title, description, tags, demoUrl, isInternal 
               rel="noopener noreferrer"
               className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
             >
-              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver el proyecto
+              <span role="img" aria-label="mano señalando a la derecha">👉</span> ver Demo
             </a>
           )
         ) : (

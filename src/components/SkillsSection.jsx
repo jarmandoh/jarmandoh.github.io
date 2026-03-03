@@ -53,20 +53,20 @@ const Skills = () => {
   };
 
   return (
-    <section id="habilidades" className="py-20 bg-gray-100">
+    <section id="habilidades" className="py-20 bg-gray-900 text-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl font-bold text-center mb-12">Mi Stack Tecnológico</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {skillsData.map((skillGroup) => (
             <div
               key={skillGroup.title}
-              className="bg-white p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-indigo-300/50"
+              className="bg-gray-800 p-8 rounded-xl shadow-xl transition duration-500 hover:shadow-indigo-900"
             >
               <h3 className="text-2xl font-semibold mb-4 flex items-center text-indigo-500">
                 {renderIcon(skillGroup.icon)}
                 <span className="ml-3">{skillGroup.title}</span>
               </h3>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-gray-300">
                 {skillGroup.skills.map((skill, index) => (
                   <li key={index} className="flex items-center">
                     <span className="text-indigo-500 mr-2">•</span>
