@@ -74,13 +74,7 @@ const Navbar = () => {
                 onClick={(e) => handleSmoothScroll(e, link.id)}
                 className={`transition duration-300 font-medium hover:text-indigo-400 ${scrolled ? 'text-gray-200' : 'text-[#07303E]'}`}
                 role="menuitem"
-                tabIndex={0}
                 aria-label={link.label}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleSmoothScroll(e, link.id);
-                  }
-                }}
               >
                 {link.label}
               </a>
@@ -127,13 +121,9 @@ const Navbar = () => {
                     onClick={(e) => handleSmoothScroll(e, link.id)}
                     className="block px-3 py-2 rounded-md text-gray-200 hover:text-indigo-400 hover:bg-white/10 transition duration-300 font-medium"
                     role="menuitem"
-                    tabIndex={0}
                     aria-label={link.label}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleSmoothScroll(e, link.id);
-                      }
-                      // Navegación con flechas
+                      // Navegación con flechas para accesibilidad
                       if (e.key === 'ArrowDown') {
                         const next = document.querySelectorAll('#mobile-menu [role="menuitem"]')[idx + 1];
                         if (next) next.focus();

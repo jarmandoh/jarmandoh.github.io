@@ -4,8 +4,10 @@ const ImageComponent = ({ url, alt, className }) => {
   return (
     <img 
       src={url}
-      alt={alt || 'Imagen'} 
+      alt={alt || ''} 
       className={className}
+      loading="lazy"
+      decoding="async"
       style={{ maxWidth: '100%', height: 'auto' }}
     />
   )

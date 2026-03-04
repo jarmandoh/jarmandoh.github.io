@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faPhone, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 
 const ContactSection = () => {
@@ -9,12 +9,13 @@ const ContactSection = () => {
     email: '',
     message: '',
   });
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
     setFormData({ name: '', email: '', message: '' });
-    alert('Mensaje enviado. Me pondré en contacto pronto.');
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 5000);
   };
 
   const handleChange = (e) => {
@@ -27,12 +28,19 @@ const ContactSection = () => {
   return (
     <section id="contacto" className="py-20 bg-gray-900 text-white" aria-labelledby="contacto-heading" role="region">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 id="contacto-heading" className="text-4xl font-bold text-center mb-12" tabIndex={0}>¿Listo para colaborar?</h2>
+        <h2 id="contacto-heading" className="text-4xl font-bold text-center mb-12">¿Listo para colaborar?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Formulario de Contacto */}
           <div className="bg-gray-800 p-8 rounded-xl shadow-2xl">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-500">Envíame un mensaje</h3>
             <form onSubmit={handleSubmit} aria-label="Formulario de contacto">
+              {/* Mensaje de éxito */}
+              {submitted && (
+                <div role="alert" className="flex items-center gap-2 mb-4 px-4 py-3 bg-green-600/20 border border-green-500 text-green-400 rounded-lg">
+                  <FontAwesomeIcon icon={faCheckCircle} className="shrink-0" />
+                  <span>¡Mensaje enviado! Me pondré en contacto pronto.</span>
+                </div>
+              )}
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
                   Nombre <span aria-hidden="true" className="text-red-500">*</span>
@@ -45,6 +53,7 @@ const ContactSection = () => {
                   onChange={handleChange}
                   required
                   className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none focus:ring-2"
+                  autoComplete="name"
                 />
               </div>
               <div className="mb-4">
@@ -59,6 +68,7 @@ const ContactSection = () => {
                   onChange={handleChange}
                   required
                   className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none focus:ring-2"
+                  autoComplete="email"
                 />
               </div>
               <div className="mb-6">
@@ -104,15 +114,15 @@ const ContactSection = () => {
 
             <div className="flex space-x-6 justify-center md:justify-start" role="list" aria-label="Redes sociales">
               {/* LinkedIn */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="LinkedIn" role="listitem" tabIndex={0}>
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="LinkedIn" role="listitem">
                 <FontAwesomeIcon icon={faLinkedin} className="w-8 h-8" />
               </a>
               {/* GitHub */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="GitHub" role="listitem" tabIndex={0}>
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="GitHub" role="listitem">
                 <FontAwesomeIcon icon={faGithub} className="w-8 h-8" />
               </a>
               {/* Twitter */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="Twitter" role="listitem" tabIndex={0}>
+              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="Twitter" role="listitem">
                 <FontAwesomeIcon icon={faTwitter} className="w-8 h-8" />
               </a>
             </div>

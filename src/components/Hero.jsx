@@ -32,7 +32,7 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
         {/* Contenido de Texto */}
         <div className="md:w-3/5 text-center md:text-left">
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-4" tabIndex={0}>
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-4">
             ¡Hola! Soy <span className="text-indigo-400">Janier Hernandez</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8">
@@ -42,18 +42,14 @@ const Hero = () => {
             <a
               href="#proyectos"
               className="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full transition duration-300 shadow-lg shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              tabIndex={0}
               aria-label="Ver proyectos"
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') e.target.click(); }}
             >
               Ver Proyectos
             </a>
             <a
               href="#contacto"
               className="inline-block border border-indigo-400 text-indigo-400 hover:bg-indigo-500 hover:text-white font-semibold py-3 px-8 rounded-full transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              tabIndex={0}
               aria-label="Ir a contacto"
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') e.target.click(); }}
             >
               Hablemos
             </a>

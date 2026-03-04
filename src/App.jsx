@@ -39,7 +39,7 @@ function App() {
               <Route path="/*" element={
                 <>
                   <Navbar />
-                  <main className="grow">
+                  <main id="main-content" className="grow">
                     <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/proyectos" element={<Projects />} />
