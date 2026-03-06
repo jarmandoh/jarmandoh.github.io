@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
 const TimeSlotPicker = React.memo(({
   slots = [],
@@ -8,27 +8,7 @@ const TimeSlotPicker = React.memo(({
   disabled = false,
   loading = false
 }) => {
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-yellow-500 border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (slots.length === 0) {
-    return (
-      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
-        <span className="text-5xl mb-4 block">📅</span>
-        <p className="text-gray-500 dark:text-gray-400">
-          No hay horarios disponibles para esta fecha
-        </p>
-      </div>
-    );
-  }
-
-  // Verificar si un slot está seleccionado
-  const isSlotSelected = useCallback((slot) => selectedSlots.some(s => s.startTime === slot.startTime), [selectedSlots]);
+  const isSlotSelected = (slot) => selectedSlots.some(s => s.startTime === slot.startTime);
 
   // Agrupar slots por categoría (mañana, tarde, noche)
   const groupedSlots = {
@@ -46,7 +26,7 @@ const TimeSlotPicker = React.memo(({
     })
   };
 
-  const renderSlotGroup = useCallback((title, icon, groupSlots, bgColor) => {
+  const renderSlotGroup = (title, icon, groupSlots, bgColor) => {
     if (groupSlots.length === 0) return null;
 
     return (
@@ -63,9 +43,10 @@ const TimeSlotPicker = React.memo(({
           {groupSlots.map((slot, index) => {
             const isSelected = isSlotSelected(slot);
             const isAvailable = slot.isAvailable;
-            const handleClick = useCallback(() => {
+            // ✅ Función inline en lugar de useCallback dentro de map
+            const handleClick = () => {
               if (isAvailable && !disabled) onToggleSlot?.(slot);
-            }, [isAvailable, disabled, onToggleSlot, slot]);
+            };
             return (
               <button
                 key={index}
@@ -133,7 +114,26 @@ const TimeSlotPicker = React.memo(({
         </div>
       </div>
     );
-  }, [disabled, isSlotSelected, onToggleSlot, showPrices]);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-yellow-500 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (slots.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
+        <span className="text-5xl mb-4 block">📅</span>
+        <p className="text-gray-500 dark:text-gray-400">
+          No hay horarios disponibles para esta fecha
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>

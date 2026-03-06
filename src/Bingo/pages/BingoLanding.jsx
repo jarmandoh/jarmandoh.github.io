@@ -9,10 +9,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import RoleCard from '../components/RoleCard';
 import { rolesConfig } from '../data/rolesConfig';
-import { GoogleGenAI } from "@google/genai";
-
-// Obtener la API key desde variable de entorno
-const GOOGLE_GENAI_API_KEY = import.meta.env.VITE_GOOGLE_GENAI_API_KEY;
 
 
 const BingoLanding = () => {
@@ -20,24 +16,6 @@ const BingoLanding = () => {
     document.title = 'Bingo | Selecciona tu Rol';
   }, []);
 
-  // IA
-  const ai = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
-
-  async function consultarAI(prompt) {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-    console.log(response.text);
-  }
-
-  // Ejemplo de uso
-  useEffect(() => {
-    consultarAI("puedes darme la hora?");
-  }, []);
-  
-
-  // FIN IA
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-200 via-pink-100 to-blue-200">
       {/* Header */}

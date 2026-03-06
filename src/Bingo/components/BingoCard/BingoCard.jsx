@@ -4,15 +4,10 @@ import './BingoCard.css';
 
 const BingoCard = React.memo(({ card, calledNumbers: initialCalledNumbers, playerName, cardNumber, gameId, winPattern, winningNumbers }) => {
   const columns = ['B', 'I', 'N', 'G', 'O'];
-  const [calledNumbers, setCalledNumbers] = useState(initialCalledNumbers || []);
+  const calledNumbers = initialCalledNumbers || [];
   const [markedNumbers, setMarkedNumbers] = useState(new Set());
   const [hasNotifiedWin, setHasNotifiedWin] = useState(false);
   const { socket } = useSocket();
-
-  // Sincronizar calledNumbers cuando cambian desde el prop
-  useEffect(() => {
-    setCalledNumbers(initialCalledNumbers || []);
-  }, [initialCalledNumbers]);
 
   // Función para verificar si los números marcados forman el patrón de victoria
   const checkWinningPattern = (markedNums, pattern, cardData) => {
