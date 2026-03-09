@@ -52,8 +52,8 @@ const GameBoard = React.memo(({
 
         {player.fichas && player.fichas.length > 0 && (
           <div className="player-fichas">
-            {player.fichas.map((ficha, index) => (
-              <span key={index} className="ficha-badge">
+            {player.fichas.map((ficha) => (
+              <span key={ficha} className="ficha-badge">
                 {gameState === GAME_STATES.REVEALING || gameState === GAME_STATES.FINISHED || isMe
                   ? ficha
                   : '?'}
@@ -138,8 +138,9 @@ const BettingControls = ({ playerChips, onBet, hasPlacedBet }) => {
 
   return (
     <div className="betting-controls">
-      <label>Cantidad a apostar:</label>
+      <label htmlFor="bet-amount">Cantidad a apostar:</label>
       <input 
+        id="bet-amount"
         type="number"
         value={betAmount}
         onChange={(e) => setBetAmount(Number(e.target.value))}

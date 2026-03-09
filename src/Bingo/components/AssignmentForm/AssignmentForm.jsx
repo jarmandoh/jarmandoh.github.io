@@ -1,27 +1,180 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faPhone, faEnvelope, faHashtag, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import './AssignmentForm.css';
 
-const AssignmentForm = ({ assignment, isCardAssigned, onSubmit, onClose, currentRaffle, maxCards = 1200 }) => {
-  const [formData, setFormData] = useState({
-    cardNumber: '',
-    participantName: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    paid: false,
-    raffleId: currentRaffle || 1
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+const AssignmentCardField = ({ formData, errors, maxCards, generateRandomCard, onChange }) => (
+  <div>
+    <label htmlFor="assignment-card-number" className="assignment-label">
+      <FontAwesomeIcon icon={faHashtag} className="assignment-label-icon" />
+      Número de Cartón
+    </label>
+    <div className="assignment-card-input-group">
+      <div className="assignment-input-flex">
+        <input
+          id="assignment-card-number"
+          type="number"
+          min="1"
+          max={maxCards}
+          value={formData.cardNumber}
+          onChange={(e) => onChange('cardNumber', e.target.value)}
+          className={`assignment-input ${errors.cardNumber ? 'assignment-input-error' : ''}`}
+          placeholder="Ej: 123"
+        />
+        {errors.cardNumber && (
+          <p className="assignment-error">{errors.cardNumber}</p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={generateRandomCard}
+        className="assignment-random-button"
+        title="Generar cartón aleatorio disponible"
+      >
+        <FontAwesomeIcon icon={faGamepad} />
+      </button>
+    </div>
+  </div>
+);
 
-  // Cargar datos si estamos editando
-  useEffect(() => {
+const AssignmentParticipantFields = ({ formData, errors, onChange }) => (
+  <div className="assignment-section">
+    <div>
+      <label htmlFor="assignment-participant-name" className="assignment-label">
+        <FontAwesomeIcon icon={faUser} className="assignment-label-icon" />
+        Nombre del Participante
+      </label>
+      <input
+        id="assignment-participant-name"
+        type="text"
+        value={formData.participantName}
+        onChange={(e) => onChange('participantName', e.target.value)}
+        className={`assignment-input ${errors.participantName ? 'assignment-input-error' : ''}`}
+        placeholder="Ej: Juan Pérez"
+      />
+      {errors.participantName && (
+        <p className="assignment-error">{errors.participantName}</p>
+      )}
+    </div>
+    <div className="assignment-grid">
+      <div>
+        <label htmlFor="assignment-first-name" className="assignment-label-optional">
+          Nombre (opcional)
+        </label>
+        <input
+          id="assignment-first-name"
+          type="text"
+          onChange={(e) => onChange('firstName', e.target.value)}
+          className="assignment-input"
+          placeholder="Ej: Juan"
+        />
+      </div>
+      <div>
+        <label htmlFor="assignment-last-name" className="assignment-label-optional">
+          Apellido (opcional)
+        </label>
+        <input
+          id="assignment-last-name"
+          type="text"
+          onChange={(e) => onChange('lastName', e.target.value)}
+          className="assignment-input"
+          placeholder="Ej: Pérez"
+        />
+      </div>
+    </div>
+  </div>
+);
+
+const AssignmentContactFields = ({ formData, errors, onChange }) => (
+  <div className="assignment-grid">
+    <div>
+      <label htmlFor="assignment-phone" className="assignment-label">
+        <FontAwesomeIcon icon={faPhone} className="assignment-label-icon" />
+        Teléfono (opcional)
+      </label>
+      <input
+        id="assignment-phone"
+        type="tel"
+        value={formData.phone}
+        onChange={(e) => onChange('phone', e.target.value)}
+        className={`assignment-input ${errors.phone ? 'assignment-input-error' : ''}`}
+        placeholder="Ej: +1234567890"
+      />
+      {errors.phone && (
+        <p className="assignment-error">{errors.phone}</p>
+      )}
+    </div>
+    <div>
+      <label htmlFor="assignment-email" className="assignment-label">
+        <FontAwesomeIcon icon={faEnvelope} className="assignment-label-icon" />
+        Email (opcional)
+      </label>
+      <input
+        id="assignment-email"
+        type="email"
+        value={formData.email}
+        onChange={(e) => onChange('email', e.target.value)}
+        className={`assignment-input ${errors.email ? 'assignment-input-error' : ''}`}
+        placeholder="Ej: juan@email.com"
+      />
+      {errors.email && (
+        <p className="assignment-error">{errors.email}</p>
+      )}
+    </div>
+  </div>
+);
+
+const AssignmentConfigFields = ({ formData, errors, currentRaffle, onChange }) => (
+  <div className="assignment-grid">
+    <div>
+      <label htmlFor="assignment-raffle-id" className="assignment-label-optional">
+        ID del Sorteo
+      </label>
+      {currentRaffle ? (
+        <>
+          <div className="assignment-input-readonly">
+            <span className="assignment-readonly-text">Sorteo {currentRaffle}</span>
+          </div>
+          <input type="hidden" value={currentRaffle} />
+        </>
+      ) : (
+        <select
+          id="assignment-raffle-id"
+          value={formData.raffleId}
+          onChange={(e) => onChange('raffleId', parseInt(e.target.value))}
+          className={`assignment-select ${errors.raffleId ? 'assignment-input-error' : ''}`}
+        >
+          {Array.from({ length: 10 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              Sorteo {i + 1}
+            </option>
+          ))}
+        </select>
+      )}
+      {errors.raffleId && (
+        <p className="assignment-error">{errors.raffleId}</p>
+      )}
+    </div>
+    <div className="assignment-checkbox-wrapper">
+      <label className="assignment-checkbox-label">
+        <input
+          type="checkbox"
+          checked={formData.paid}
+          onChange={(e) => onChange('paid', e.target.checked)}
+          className="assignment-checkbox"
+        />
+        <span className="assignment-checkbox-text">
+          Marcado como pagado
+        </span>
+      </label>
+    </div>
+  </div>
+);
+
+const AssignmentForm = ({ assignment, isCardAssigned, onSubmit, onClose, currentRaffle, maxCards = 1200 }) => {
+  const [formData, setFormData] = useState(() => {
     if (assignment) {
-      setFormData({
+      return {
         cardNumber: assignment.cardNumber || assignment.startCard || '',
         participantName: assignment.participantName || `${assignment.firstName || ''} ${assignment.lastName || ''}`.trim(),
         firstName: assignment.firstName || '',
@@ -30,14 +183,22 @@ const AssignmentForm = ({ assignment, isCardAssigned, onSubmit, onClose, current
         email: assignment.email || '',
         paid: assignment.paid || false,
         raffleId: assignment.raffleId || assignment.raffleNumber || currentRaffle || 1
-      });
-    } else if (currentRaffle) {
-      setFormData(prev => ({
-        ...prev,
-        raffleId: currentRaffle
-      }));
+      };
     }
-  }, [assignment, currentRaffle]);
+    return {
+      cardNumber: '',
+      participantName: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      email: '',
+      paid: false,
+      raffleId: currentRaffle || 1
+    };
+  });
+  
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -98,7 +259,7 @@ const AssignmentForm = ({ assignment, isCardAssigned, onSubmit, onClose, current
         endCard: parseInt(formData.cardNumber),
         quantity: 1,
         createdAt: assignment?.createdAt || new Date().toISOString(),
-        id: assignment?.id || Date.now().toString()
+        id: assignment?.id || crypto.randomUUID()
       };
 
       await onSubmit(processedData);
@@ -148,169 +309,29 @@ const AssignmentForm = ({ assignment, isCardAssigned, onSubmit, onClose, current
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="assignment-form">
-          {/* Número de cartón */}
-          <div>
-            <label className="assignment-label">
-              <FontAwesomeIcon icon={faHashtag} className="assignment-label-icon" />
-              Número de Cartón
-            </label>
-            <div className="assignment-card-input-group">
-              <div className="assignment-input-flex">
-                <input
-                  type="number"
-                  min="1"
-                  max={maxCards}
-                  value={formData.cardNumber}
-                  onChange={(e) => handleChange('cardNumber', e.target.value)}
-                  className={`assignment-input ${errors.cardNumber ? 'assignment-input-error' : ''}`}
-                  placeholder="Ej: 123"
-                />
-                {errors.cardNumber && (
-                  <p className="assignment-error">{errors.cardNumber}</p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={generateRandomCard}
-                className="assignment-random-button"
-                title="Generar cartón aleatorio disponible"
-              >
-                <FontAwesomeIcon icon={faGamepad} />
-              </button>
-            </div>
-          </div>
-
-          {/* Datos del participante */}
-          <div className="assignment-section">
-            <div>
-              <label className="assignment-label">
-                <FontAwesomeIcon icon={faUser} className="assignment-label-icon" />
-                Nombre del Participante
-              </label>
-              <input
-                type="text"
-                value={formData.participantName}
-                onChange={(e) => handleChange('participantName', e.target.value)}
-                className={`assignment-input ${errors.participantName ? 'assignment-input-error' : ''}`}
-                placeholder="Ej: Juan Pérez"
-              />
-              {errors.participantName && (
-                <p className="assignment-error">{errors.participantName}</p>
-              )}
-            </div>
-
-            {/* Datos adicionales */}
-            <div className="assignment-grid">
-              <div>
-                <label className="assignment-label-optional">
-                  Nombre (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
-                  className="assignment-input"
-                  placeholder="Ej: Juan"
-                />
-              </div>
-
-              <div>
-                <label className="assignment-label-optional">
-                  Apellido (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
-                  className="assignment-input"
-                  placeholder="Ej: Pérez"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Contacto */}
-          <div className="assignment-grid">
-            <div>
-              <label className="assignment-label">
-                <FontAwesomeIcon icon={faPhone} className="assignment-label-icon" />
-                Teléfono (opcional)
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className={`assignment-input ${errors.phone ? 'assignment-input-error' : ''}`}
-                placeholder="Ej: +1234567890"
-              />
-              {errors.phone && (
-                <p className="assignment-error">{errors.phone}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="assignment-label">
-                <FontAwesomeIcon icon={faEnvelope} className="assignment-label-icon" />
-                Email (opcional)
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className={`assignment-input ${errors.email ? 'assignment-input-error' : ''}`}
-                placeholder="Ej: juan@email.com"
-              />
-              {errors.email && (
-                <p className="assignment-error">{errors.email}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Configuración */}
-          <div className="assignment-grid">
-            <div>
-              <label className="assignment-label-optional">
-                ID del Sorteo
-              </label>
-              {currentRaffle ? (
-                <>
-                  <div className="assignment-input-readonly">
-                    <span className="assignment-readonly-text">Sorteo {currentRaffle}</span>
-                  </div>
-                  <input type="hidden" value={currentRaffle} />
-                </>
-              ) : (
-                <select
-                  value={formData.raffleId}
-                  onChange={(e) => handleChange('raffleId', parseInt(e.target.value))}
-                  className={`assignment-select ${errors.raffleId ? 'assignment-input-error' : ''}`}
-                >
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      Sorteo {i + 1}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {errors.raffleId && (
-                <p className="assignment-error">{errors.raffleId}</p>
-              )}
-            </div>
-
-            <div className="assignment-checkbox-wrapper">
-              <label className="assignment-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={formData.paid}
-                  onChange={(e) => handleChange('paid', e.target.checked)}
-                  className="assignment-checkbox"
-                />
-                <span className="assignment-checkbox-text">
-                  Marcado como pagado
-                </span>
-              </label>
-            </div>
-          </div>
+          <AssignmentCardField
+            formData={formData}
+            errors={errors}
+            maxCards={maxCards}
+            generateRandomCard={generateRandomCard}
+            onChange={handleChange}
+          />
+          <AssignmentParticipantFields
+            formData={formData}
+            errors={errors}
+            onChange={handleChange}
+          />
+          <AssignmentContactFields
+            formData={formData}
+            errors={errors}
+            onChange={handleChange}
+          />
+          <AssignmentConfigFields
+            formData={formData}
+            errors={errors}
+            currentRaffle={currentRaffle}
+            onChange={handleChange}
+          />
 
           {/* Botones */}
           <div className="assignment-buttons">

@@ -33,17 +33,18 @@ const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()} role="presentation">
+      <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="create-room-title" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Crear Nueva Sala</h2>
+          <h2 id="create-room-title">Crear Nueva Sala</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Nombre de la Sala</label>
+            <label htmlFor="room-name">Nombre de la Sala</label>
             <input
+              id="room-name"
               type="text"
               name="name"
               value={formData.name}
@@ -54,8 +55,9 @@ const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
           </div>
 
           <div className="form-group">
-            <label>Jugadores Máximos</label>
+            <label htmlFor="room-max-players">Jugadores Máximos</label>
             <input
+              id="room-max-players"
               type="number"
               name="maxPlayers"
               value={formData.maxPlayers}
@@ -68,8 +70,9 @@ const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
           </div>
 
           <div className="form-group">
-            <label>Apuesta Mínima</label>
+            <label htmlFor="room-min-bet">Apuesta Mínima</label>
             <input
+              id="room-min-bet"
               type="number"
               name="minBet"
               value={formData.minBet}
@@ -83,8 +86,9 @@ const CreateRoomModal = React.memo(({ isOpen, onClose, onCreate }) => {
           </div>
 
           <div className="form-group">
-            <label>Fichas Iniciales</label>
+            <label htmlFor="room-starting-chips">Fichas Iniciales</label>
             <input
+              id="room-starting-chips"
               type="number"
               name="startingChips"
               value={formData.startingChips}

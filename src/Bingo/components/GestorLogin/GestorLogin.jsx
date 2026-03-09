@@ -97,10 +97,11 @@ const GestorLogin = () => {
         <form onSubmit={handleSubmit} className="gestor-form">
           {/* Selector de Juego */}
           <div>
-            <label className="gestor-label">
+            <label htmlFor="gestor-game-id" className="gestor-label">
               Juego Asignado
             </label>
             <select
+              id="gestor-game-id"
               name="gameId"
               value={formData.gameId}
               onChange={handleInputChange}
@@ -118,10 +119,11 @@ const GestorLogin = () => {
 
           {/* Nombre del Gestor */}
           <div>
-            <label className="gestor-label">
+            <label htmlFor="gestor-name" className="gestor-label">
               Tu Nombre
             </label>
             <input
+              id="gestor-name"
               type="text"
               name="gestorName"
               value={formData.gestorName}
@@ -133,11 +135,12 @@ const GestorLogin = () => {
 
           {/* Contraseña */}
           <div>
-            <label className="gestor-label">
+            <label htmlFor="gestor-password" className="gestor-label">
               Contraseña del Sorteo
             </label>
             <div className="gestor-password-wrapper">
               <input
+                id="gestor-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={formData.password}

@@ -114,15 +114,15 @@ const ContactSection = () => {
 
             <div className="flex space-x-6 justify-center md:justify-start" role="list" aria-label="Redes sociales">
               {/* LinkedIn */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="LinkedIn" role="listitem">
+              <a href="https://linkedin.com/in/jarmandoh" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="LinkedIn" role="listitem">
                 <FontAwesomeIcon icon={faLinkedin} className="w-8 h-8" />
               </a>
               {/* GitHub */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="GitHub" role="listitem">
+              <a href="https://github.com/jarmandoh" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="GitHub" role="listitem">
                 <FontAwesomeIcon icon={faGithub} className="w-8 h-8" />
               </a>
               {/* Twitter */}
-              <a href="#" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="Twitter" role="listitem">
+              <a href="https://twitter.com/jarmandoh" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-indigo-500 transition duration-300" aria-label="Twitter" role="listitem">
                 <FontAwesomeIcon icon={faTwitter} className="w-8 h-8" />
               </a>
             </div>

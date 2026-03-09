@@ -136,17 +136,17 @@ function Contact() {
             }`}>
               <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Redes Sociales</h3>
               <div className="mt-2 flex justify-center space-x-4">
-                <a href="#" className={`transition-colors ${
+                <a href="https://linkedin.com/in/jarmandoh" target="_blank" rel="noopener noreferrer" className={`transition-colors ${
                   isDark ? 'text-gray-400 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'
                 }`}>
                   LinkedIn
                 </a>
-                <a href="#" className={`transition-colors ${
+                <a href="https://github.com/jarmandoh" target="_blank" rel="noopener noreferrer" className={`transition-colors ${
                   isDark ? 'text-gray-400 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'
                 }`}>
                   GitHub
                 </a>
-                <a href="#" className={`transition-colors ${
+                <a href="https://twitter.com/jarmandoh" target="_blank" rel="noopener noreferrer" className={`transition-colors ${
                   isDark ? 'text-gray-400 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'
                 }`}>
                   Twitter

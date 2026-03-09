@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useReducer } from 'react';
 import { useReservas } from '../../context/ReservasContext';
 import CourtCard from '../CourtCard';
 import TimeSlotPicker from '../TimeSlotPicker';
@@ -6,13 +6,20 @@ import TimeSlotPicker from '../TimeSlotPicker';
 const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) => {
   const { courts, getAvailableSlots, createReservation, settings, formatPrice } = useReservas();
   const formRef = useRef(null);
-  
+
+  function mergeReducer(state, patch) {
+    return { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
+  }
+
   const [step, setStep] = useState(1);
   const [selectedCourt, setSelectedCourt] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedSlots, setSelectedSlots] = useState([]);
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotsState, dispatchSlots] = useReducer(mergeReducer, {
+    selectedSlots: [],
+    availableSlots: [],
+    loadingSlots: false,
+  });
+  const { selectedSlots, availableSlots, loadingSlots } = slotsState;
   const [toast, setToast] = useState(null);
   const toastTimeoutRef = useRef(null);
   const [customerData, setCustomerData] = useState({
@@ -44,13 +51,11 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
   // Cargar horarios cuando cambia la cancha o fecha
   useEffect(() => {
     if (selectedCourt && selectedDate) {
-      setLoadingSlots(true);
+      dispatchSlots({ loadingSlots: true });
       // Simular delay de red
       setTimeout(() => {
         const slots = getAvailableSlots(selectedCourt.id, selectedDate);
-        setAvailableSlots(slots);
-        setLoadingSlots(false);
-        setSelectedSlots([]);
+        dispatchSlots({ availableSlots: slots, loadingSlots: false, selectedSlots: [] });
       }, 300);
     }
   }, [selectedCourt, selectedDate, getAvailableSlots]);
@@ -102,13 +107,13 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
 
   // Manejar toggle de slot (multi-selección libre)
   const handleToggleSlot = useCallback((slot) => {
-    setSelectedSlots(prev => {
-      const isAlreadySelected = prev.some(s => s.startTime === slot.startTime);
+    dispatchSlots((prev) => {
+      const isAlreadySelected = prev.selectedSlots.some(s => s.startTime === slot.startTime);
       let newSlots;
       if (isAlreadySelected) {
-        newSlots = prev.filter(s => s.startTime !== slot.startTime);
+        newSlots = prev.selectedSlots.filter(s => s.startTime !== slot.startTime);
       } else {
-        newSlots = [...prev, slot].sort((a, b) => a.startTime.localeCompare(b.startTime));
+        newSlots = [...prev.selectedSlots, slot].sort((a, b) => a.startTime.localeCompare(b.startTime));
       }
       // Mostrar toast si más de 1 hora seleccionada
       if (newSlots.length > 1) {
@@ -122,15 +127,14 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
       } else {
         setToast(null);
       }
-      return newSlots;
+      return { ...prev, selectedSlots: newSlots };
     });
   }, [formatPrice, showToast]);
 
   // Manejar selección de cancha
   const handleSelectCourt = useCallback((court) => {
     setSelectedCourt(court);
-    setSelectedSlots([]);
-    setAvailableSlots([]);
+    dispatchSlots({ selectedSlots: [], availableSlots: [] });
     // Auto-avanzar al paso 2 tras seleccionar cancha, sin delay artificial
     goToStep(2);
   }, [goToStep]);
@@ -138,7 +142,7 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
   // Manejar cambio de fecha
   const handleDateChange = useCallback((e) => {
     setSelectedDate(e.target.value);
-    setSelectedSlots([]);
+    dispatchSlots({ selectedSlots: [] });
   }, []);
 
   // Manejar envío del formulario
@@ -238,6 +242,9 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
                   step >= s.num ? 'text-sky-600 dark:text-sky-400' : 'text-gray-400'
                 }`}
                 onClick={() => s.num < step && goToStep(s.num)}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && s.num < step && goToStep(s.num)}
+                role="button"
+                tabIndex={s.num < step ? 0 : -1}
               >
                 <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-500 ${
                   step >= s.num 
@@ -361,9 +368,9 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
 
             {/* Date Picker - Visual Calendar */}
             <div className="mb-8">
-              <label className="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2" style={{ fontFamily: "'Exo 2', sans-serif" }}>
+              <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2" style={{ fontFamily: "'Exo 2', sans-serif" }}>
                 <span className="text-2xl">📅</span> Selecciona una fecha
-              </label>
+              </p>
               
               {/* Visual Day Cards */}
               <div className="flex gap-2 overflow-x-auto py-4 scrollbar-thin">
@@ -378,7 +385,7 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
                     <button
                       key={dateStr}
                       onClick={() => handleDateChange({ target: { value: dateStr } })}
-                      className={`relative shrink-0 w-[72px] py-3 rounded-2xl flex flex-col items-center gap-1 transition-all duration-300 transform hover:scale-105 border-2 ${
+                      className={`relative shrink-0 w-18 py-3 rounded-2xl flex flex-col items-center gap-1 transition-all duration-300 transform hover:scale-105 border-2 ${
                         isSelected
                           ? 'bg-linear-to-b from-sky-500 to-sky-600 text-white border-sky-400 shadow-lg shadow-sky-500/30 scale-105'
                           : isWeekend
@@ -436,9 +443,9 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
             {/* Time Slots */}
             {selectedDate && (
               <div>
-                <label className="text-base font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2" style={{ fontFamily: "'Exo 2', sans-serif" }}>
+                <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2" style={{ fontFamily: "'Exo 2', sans-serif" }}>
                   <span className="text-2xl">🕐</span> Horario disponible
-                </label>
+                </p>
                 <TimeSlotPicker
                   slots={availableSlots}
                   selectedSlots={selectedSlots}
@@ -499,8 +506,8 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
                 <div className="mt-3 pt-3 border-t border-yellow-300 dark:border-yellow-700">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-semibold">Desglose por hora:</p>
                   <div className="space-y-1">
-                    {sortedSelectedSlots.map((slot, i) => (
-                      <div key={i} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                    {sortedSelectedSlots.map((slot) => (
+                      <div key={`${slot.startTime}-${slot.endTime}`} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                         <span>{slot.startTime} - {slot.endTime}</span>
                         <span className="font-medium">{slot.formattedPrice}</span>
                       </div>
@@ -523,10 +530,11 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
             {/* Customer Form */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="reservation-full-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Nombre completo *
                 </label>
                 <input
+                  id="reservation-full-name"
                   type="text"
                   value={customerData.fullName}
                   onChange={(e) => setCustomerData(prev => ({ ...prev, fullName: e.target.value }))}
@@ -541,10 +549,11 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="reservation-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Email *
                 </label>
                 <input
+                  id="reservation-email"
                   type="email"
                   value={customerData.email}
                   onChange={(e) => setCustomerData(prev => ({ ...prev, email: e.target.value }))}
@@ -559,10 +568,11 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="reservation-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Teléfono *
                 </label>
                 <input
+                  id="reservation-phone"
                   type="tel"
                   value={customerData.phone}
                   onChange={(e) => setCustomerData(prev => ({ ...prev, phone: e.target.value }))}
@@ -577,10 +587,11 @@ const ReservationForm = React.memo(({ onSuccess, onCancel, fullPage = false }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="reservation-notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Notas adicionales (opcional)
                 </label>
                 <textarea
+                  id="reservation-notes"
                   value={customerData.notes}
                   onChange={(e) => setCustomerData(prev => ({ ...prev, notes: e.target.value }))}
                   rows={3}

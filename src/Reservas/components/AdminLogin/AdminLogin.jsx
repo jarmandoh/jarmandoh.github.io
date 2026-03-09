@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { useReservas } from '../../context/ReservasContext';
+
+const loginInitialState = { username: '', password: '', error: '', loading: false, showPassword: false };
+function loginReducer(state, patch) {
+  return { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
+}
 
 const AdminLogin = ({ onSuccess }) => {
   const { loginAdmin } = useReservas();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [loginState, dispatch] = useReducer(loginReducer, loginInitialState);
+  const { username, password, error, loading, showPassword } = loginState;
+  const setUsername = (val) => dispatch({ username: val });
+  const setPassword = (val) => dispatch({ password: val });
+  const setError = (val) => dispatch({ error: val });
+  const setLoading = (val) => dispatch({ loading: val });
+  const setShowPassword = (val) => dispatch({ showPassword: typeof val === 'function' ? val(loginState.showPassword) : val });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +68,7 @@ const AdminLogin = ({ onSuccess }) => {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="reservas-username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Usuario
                 </label>
                 <div className="relative">
@@ -69,6 +76,7 @@ const AdminLogin = ({ onSuccess }) => {
                     👤
                   </span>
                   <input
+                    id="reservas-username"
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -81,7 +89,7 @@ const AdminLogin = ({ onSuccess }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="reservas-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Contraseña
                 </label>
                 <div className="relative">
@@ -89,6 +97,7 @@ const AdminLogin = ({ onSuccess }) => {
                     🔑
                   </span>
                   <input
+                    id="reservas-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

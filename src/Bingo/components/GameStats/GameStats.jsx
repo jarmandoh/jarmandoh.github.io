@@ -7,11 +7,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './GameStats.css';
 
+const EMPTY_ASSIGNMENTS = [];
+const EMPTY_GAME_STATS = {};
+const EMPTY_CALLED_NUMBERS = [];
+
 const GameStats = ({ 
-  assignments = [], 
-  gameStats = {}, 
+  assignments = EMPTY_ASSIGNMENTS, 
+  gameStats = EMPTY_GAME_STATS, 
   currentRaffle = 1, 
-  calledNumbers = [],
+  calledNumbers = EMPTY_CALLED_NUMBERS,
   maxNumbers = 75 
 }) => {
   // Calcular cartones totales desde las asignaciones
@@ -60,8 +64,8 @@ const GameStats = ({
 
   return (
     <div className="cont-stats">
-      {statsData.map((stat, index) => (
-        <div key={index} className="stat-card">
+      {statsData.map((stat) => (
+        <div key={stat.label} className="stat-card">
           <div className="stat-content">
             <div className="stat-text">
               <p className="stat-label">{stat.label}</p>

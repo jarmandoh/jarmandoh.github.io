@@ -9,7 +9,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './AssignmentStats.css';
 
-const AssignmentStats = ({ assignments = [], currentRaffle, maxCards = 1200 }) => {
+const EMPTY_ASSIGNMENTS = [];
+
+const AssignmentStats = ({ assignments = EMPTY_ASSIGNMENTS, currentRaffle, maxCards = 1200 }) => {
   // Calcular estadísticas a partir de las asignaciones
   const stats = {
     total: assignments.length,

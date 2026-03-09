@@ -279,6 +279,9 @@ const BingoCard = React.memo(({ card, calledNumbers: initialCalledNumbers, playe
                 key={`${rowIndex}-${colIndex}`}
                 data-number={num}
                 onClick={() => toggleNumber(num)}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleNumber(num)}
+                role="button"
+                tabIndex={0}
                 className={`bingo-card__cell ${
                   isMarked && !isFree ? 'bingo-card__cell--flipped' : ''
                 } ${isDisabled ? 'bingo-card__cell--disabled' : ''}`}
@@ -323,7 +326,7 @@ const BingoCard = React.memo(({ card, calledNumbers: initialCalledNumbers, playe
             fontWeight: 'bold',
             cursor: 'pointer',
             fontSize: '14px',
-            transition: 'all 0.2s'
+            transition: 'background-color 0.2s'
           }}
           onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
           onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}

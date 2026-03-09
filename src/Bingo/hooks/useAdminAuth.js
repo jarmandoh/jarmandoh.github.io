@@ -6,7 +6,7 @@ export const useAdminAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Contraseña predeterminada (en un entorno real esto estaría en el backend)
-  const ADMIN_PASSWORD = 'bingo2025admin';
+  const ADMIN_PASSWORD = 'bingoAdmin1234'; // Cambia esta contraseña por una más segura en producción
   const AUTH_STORAGE_KEY = 'bingoAdminAuth';
   const AUTH_EXPIRY_HOURS = 24; // Sesión válida por 24 horas
 

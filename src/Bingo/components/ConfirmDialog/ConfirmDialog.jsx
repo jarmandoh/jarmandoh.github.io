@@ -12,6 +12,8 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
       <div 
         className="confirm-dialog__backdrop"
         onClick={onCancel}
+        onKeyDown={(e) => e.key === 'Escape' && onCancel()}
+        role="presentation"
       ></div>
 
       {/* Dialog */}

@@ -19,6 +19,9 @@ const CourtCard = React.memo(({
   return (
     <div 
       onClick={handleSelect}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSelect()}
+      role="button"
+      tabIndex={0}
       className={`relative bg-gray-50 dark:bg-white/10 rounded-3xl overflow-hidden shadow-lg cursor-pointer ${isSelected ? 'ring-4 ring-sky-500 shadow-2xl shadow-sky-500/30 scale-[1.02]' : ''} ${compact ? 'p-4' : ''}`}
     >
       {/* Fondo decorativo (sin animación de hover) */}
@@ -118,9 +121,9 @@ const CourtCard = React.memo(({
         {/* Amenities */}
         {showDetails && court.amenities && court.amenities.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {court.amenities.slice(0, compact ? 2 : 4).map((amenity, index) => (
+            {court.amenities.slice(0, compact ? 2 : 4).map((amenity) => (
               <span 
-                key={index}
+                key={amenity}
                 className="px-2.5 py-1 bg-linear-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-600 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
               >
                 {amenity}

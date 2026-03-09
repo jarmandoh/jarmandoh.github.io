@@ -102,11 +102,12 @@ const PlayerLogin = ({ onLogin }) => {
             <form onSubmit={handleSubmit} className="player-form">
               {/* Nombre del jugador */}
               <div>
-                <label className="player-label">
+                <label htmlFor="player-name" className="player-label">
                   <FontAwesomeIcon icon={faUser} className="player-label-icon" />
                   Tu Nombre
                 </label>
                 <input
+                  id="player-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
@@ -118,11 +119,12 @@ const PlayerLogin = ({ onLogin }) => {
 
               {/* ID del juego */}
               <div>
-                <label className="player-label">
+                <label htmlFor="player-game-id" className="player-label">
                   <FontAwesomeIcon icon={faHashtag} className="player-label-icon" />
                   ID del Juego
                 </label>
                 <input
+                  id="player-game-id"
                   type="text"
                   value={formData.gameId}
                   onChange={(e) => handleChange('gameId', e.target.value)}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faLock, 
@@ -11,12 +11,19 @@ import {
 import { Link } from 'react-router-dom';
 import './AdminLogin.css';
 
+const loginInitialState = { password: '', showPassword: false, error: '', isLoading: false, attempts: 0 };
+function loginReducer(state, patch) {
+  return { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
+}
+
 const AdminLogin = ({ onLogin }) => {
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [attempts, setAttempts] = useState(0);
+  const [loginState, dispatch] = useReducer(loginReducer, loginInitialState);
+  const { password, showPassword, error, isLoading, attempts } = loginState;
+  const setPassword = (val) => dispatch({ password: val });
+  const setShowPassword = (val) => dispatch({ showPassword: typeof val === 'function' ? val(loginState.showPassword) : val });
+  const setError = (val) => dispatch({ error: val });
+  const setIsLoading = (val) => dispatch({ isLoading: val });
+  const setAttempts = (val) => dispatch({ attempts: typeof val === 'function' ? val(loginState.attempts) : val });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,12 +91,13 @@ const AdminLogin = ({ onLogin }) => {
             <form onSubmit={handleSubmit} className="admin-form">
               {/* Campo de contraseña */}
               <div>
-                <label className="admin-label">
+                <label htmlFor="admin-password" className="admin-label">
                   <FontAwesomeIcon icon={faLock} className="admin-label-icon" />
                   Contraseña de Administrador
                 </label>
                 <div className="admin-input-wrapper">
                   <input
+                    id="admin-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

@@ -10,7 +10,21 @@ export const useBingoAdmin = () => {
     const savedAssignments = localStorage.getItem('bingoAssignments');
     if (savedAssignments) {
       try {
-        setAssignments(JSON.parse(savedAssignments));
+        const parsed = JSON.parse(savedAssignments);
+        // Sanear IDs duplicados o inválidos que puedan existir en datos previos
+        const seen = new Set();
+        const sanitized = parsed.map((a) => {
+          if (!a.id || seen.has(String(a.id))) {
+            return { ...a, id: crypto.randomUUID() };
+          }
+          seen.add(String(a.id));
+          return a;
+        });
+        // Si hubo cambios, persistir datos limpios
+        if (sanitized.some((a, i) => a.id !== parsed[i].id)) {
+          localStorage.setItem('bingoAssignments', JSON.stringify(sanitized));
+        }
+        setAssignments(sanitized);
       } catch (error) {
         console.error('Error al cargar asignaciones:', error);
       }
@@ -26,7 +40,7 @@ export const useBingoAdmin = () => {
   // Asignar cartón a una persona
   const assignCard = useCallback((assignment) => {
     const newAssignment = {
-      id: Date.now() + Math.random(), // ID único
+      id: crypto.randomUUID(), // ID único garantizado
       cardNumber: assignment.cardNumber,
       firstName: assignment.firstName,
       lastName: assignment.lastName,

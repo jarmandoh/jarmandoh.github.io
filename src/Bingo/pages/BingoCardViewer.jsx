@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faHome, faPrint } from '@fortawesome/free-solid-svg-icons';
@@ -6,43 +6,25 @@ import { generateBingoCards } from '../data/cardsGenerator';
 
 const BingoCardViewer = React.memo(() => {
   const { cardId } = useParams();
-  const [loading, setLoading] = useState(true);
-
   // Memoizar generación de todos los cartones
   const allCards = useMemo(() => generateBingoCards(), []);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (cardId) {
-      document.title = `Cartón #${cardId} | Bingo`;
-    }
-  }, [cardId]);
+  if (cardId) document.title = `Cartón #${cardId} | Bingo`;
 
   // Memoizar cálculo del cartón actual
   const cardNumber = useMemo(() => parseInt(cardId), [cardId]);
   const currentCard = useMemo(() => {
-    if (!loading && allCards.length > 0 && cardNumber >= 1 && cardNumber <= 1200) {
+    if (allCards.length > 0 && cardNumber >= 1 && cardNumber <= 1200) {
       return allCards.find(c => c.id === cardNumber);
     }
     return null;
-  }, [loading, allCards, cardNumber]);
+  }, [allCards, cardNumber]);
 
   const columns = ['B', 'I', 'N', 'G', 'O'];
 
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-        <div className="text-white text-xl">Cargando cartón...</div>
-      </div>
-    );
-  }
 
   if (!currentCard || cardNumber < 1 || cardNumber > 1200) {
     return (
@@ -163,19 +145,6 @@ const BingoCardViewer = React.memo(() => {
           </div>
         </div>
       </div>
-
-      {/* Estilos para impresión */}
-      <style jsx="true">{`
-        @media print {
-          body { margin: 0; }
-          .print\\:hidden { display: none !important; }
-          .print\\:shadow-none { box-shadow: none !important; }
-          .print\\:border { border: 2px solid black !important; }
-          .print\\:border-black { border-color: black !important; }
-          .print\\:bg-white { background-color: white !important; }
-          .print\\:mt-4 { margin-top: 1rem !important; }
-        }
-      `}</style>
     </div>
   );
 });

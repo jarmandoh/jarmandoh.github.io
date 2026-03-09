@@ -8,19 +8,23 @@ import {
   faMinus,
   faCheck,
   faExclamationTriangle,
-  faInfoCircle
+  faInfoCircle,
+  faTrophy,
+  faLink
 } from '@fortawesome/free-solid-svg-icons';
 import './GameCreationModal.css';
 
-const GameCreationModal = ({ onCreateGame, onClose }) => {
-  const [formData, setFormData] = useState({
+const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, initialRaffleConfig = null, raffleNumber = null }) => {
+  const [formData, setFormData] = useState(() => ({
     name: '',
     description: '',
     maxCards: 100,
-    winPatterns: [],
+    winPatterns: raffleConfigMode && initialRaffleConfig?.winPattern ? [initialRaffleConfig.winPattern] : [],
     customPattern: Array(25).fill(false),
-    enableCustomPattern: false
-  });
+    enableCustomPattern: false,
+    prize: initialRaffleConfig?.prize || '',
+    prizeImageUrl: initialRaffleConfig?.prizeImageUrl || '',
+  }));
 
   const [snackbar, setSnackbar] = useState({
     show: false,
@@ -62,12 +66,20 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
   ];
 
   const handlePatternToggle = (patternId) => {
-    setFormData(prev => ({
-      ...prev,
-      winPatterns: prev.winPatterns.includes(patternId)
-        ? prev.winPatterns.filter(p => p !== patternId)
-        : [...prev.winPatterns, patternId]
-    }));
+    if (raffleConfigMode) {
+      // Selección única (radio)
+      setFormData(prev => ({
+        ...prev,
+        winPatterns: prev.winPatterns[0] === patternId ? [] : [patternId]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        winPatterns: prev.winPatterns.includes(patternId)
+          ? prev.winPatterns.filter(p => p !== patternId)
+          : [...prev.winPatterns, patternId]
+      }));
+    }
   };
 
   const handleCustomPatternToggle = (index) => {
@@ -95,20 +107,29 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!formData.name.trim()) {
-      showSnackbar('El nombre del juego es obligatorio', 'error');
-      return;
-    }
 
-    if (formData.winPatterns.length === 0 && !formData.enableCustomPattern) {
-      showSnackbar('Debe seleccionar al menos un patrón de victoria', 'error');
-      return;
-    }
-
-    if (formData.enableCustomPattern && !formData.customPattern.some(cell => cell)) {
-      showSnackbar('Debe marcar al menos una casilla en el patrón personalizado', 'error');
-      return;
+    if (raffleConfigMode) {
+      if (!formData.winPatterns[0]) {
+        showSnackbar('Debes seleccionar un patrón de victoria', 'error');
+        return;
+      }
+      if (!formData.prize.trim()) {
+        showSnackbar('Debes ingresar el nombre del premio', 'error');
+        return;
+      }
+    } else {
+      if (!formData.name.trim()) {
+        showSnackbar('El nombre del juego es obligatorio', 'error');
+        return;
+      }
+      if (formData.winPatterns.length === 0 && !formData.enableCustomPattern) {
+        showSnackbar('Debe seleccionar al menos un patrón de victoria', 'error');
+        return;
+      }
+      if (formData.enableCustomPattern && !formData.customPattern.some(cell => cell)) {
+        showSnackbar('Debe marcar al menos una casilla en el patrón personalizado', 'error');
+        return;
+      }
     }
 
     const gameData = {
@@ -116,11 +137,13 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
       description: formData.description,
       maxCards: formData.maxCards,
       winPatterns: formData.winPatterns,
-      customPattern: formData.enableCustomPattern ? formData.customPattern : null
+      customPattern: formData.enableCustomPattern ? formData.customPattern : null,
+      prize: formData.prize,
+      prizeImageUrl: formData.prizeImageUrl,
     };
 
-    showSnackbar('¡Juego creado exitosamente!', 'success');
-    
+    showSnackbar(raffleConfigMode ? '¡Configuración guardada!' : '¡Juego creado exitosamente!', 'success');
+
     setTimeout(() => {
       onCreateGame(gameData);
       onClose();
@@ -204,8 +227,8 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
         <div className="gcm-header">
           <div className="gcm-header-content">
             <div>
-              <h2 className="gcm-title">Crear Nuevo Juego</h2>
-              <p className="gcm-subtitle">Configura las opciones del juego</p>
+              <h2 className="gcm-title">{raffleConfigMode ? `Configurar Sorteo${raffleNumber ? ` ${raffleNumber}` : ''}` : 'Crear Nuevo Juego'}</h2>
+              <p className="gcm-subtitle">{raffleConfigMode ? 'Selecciona el patrón y define el premio del sorteo' : 'Configura las opciones del juego'}</p>
             </div>
             <button onClick={onClose} className="gcm-close-button">
               <FontAwesomeIcon icon={faTimes} />
@@ -215,6 +238,7 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
 
         <form onSubmit={handleSubmit} className="gcm-form">
           {/* Información básica */}
+          {!raffleConfigMode && (
           <div className="gcm-section">
             <h3 className="gcm-section-title">
               <FontAwesomeIcon icon={faGamepad} className="mr-2" />
@@ -223,8 +247,9 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
             
             <div className="gcm-grid">
               <div>
-                <label className="gcm-label">Nombre del Juego *</label>
+                <label htmlFor="gcm-game-name" className="gcm-label">Nombre del Juego *</label>
                 <input
+                  id="gcm-game-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -235,7 +260,7 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
               </div>
 
               <div>
-                <label className="gcm-label">Máximo de Cartones</label>
+                <label htmlFor="gcm-max-cards" className="gcm-label">Máximo de Cartones</label>
                 <div className="gcm-number-input">
                   <button
                     type="button"
@@ -245,6 +270,7 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
                     <FontAwesomeIcon icon={faMinus} />
                   </button>
                   <input
+                    id="gcm-max-cards"
                     type="number"
                     value={formData.maxCards}
                     onChange={(e) => {
@@ -273,8 +299,9 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
             </div>
 
             <div className="gcm-full">
-              <label className="gcm-label">Descripción (Opcional)</label>
+              <label htmlFor="gcm-description" className="gcm-label">Descripción (Opcional)</label>
               <textarea
+                id="gcm-description"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 className="gcm-textarea"
@@ -283,8 +310,9 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
               />
             </div>
           </div>
+          )}
 
-          {/* Patrones de victoria */}
+          {/* Patrones de victoria */}}
           <div className="gcm-section">
             <h3 className="gcm-section-title">
               <FontAwesomeIcon icon={faThLarge} className="mr-2" />
@@ -319,7 +347,62 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
             </div>
           </div>
 
-          {/* Patrón personalizado */}
+          {/* Premio del Sorteo */}
+          <div className="gcm-section">
+            <h3 className="gcm-section-title">
+              <FontAwesomeIcon icon={faTrophy} className="mr-2" />
+              Premio del Sorteo{raffleConfigMode ? ' *' : ''}
+            </h3>
+
+            <div className="gcm-full">
+              <label htmlFor="gcm-prize" className="gcm-label">Nombre del Premio{raffleConfigMode ? ' *' : ''}</label>
+              <input
+                id="gcm-prize"
+                type="text"
+                value={formData.prize}
+                onChange={(e) => setFormData({...formData, prize: e.target.value})}
+                className="gcm-input"
+                placeholder="Ej: $100,000 | TV 50 pulgadas | Viaje a Cartagena"
+              />
+            </div>
+
+            <div className="gcm-full" style={{ marginTop: '1rem' }}>
+              <label htmlFor="gcm-prize-image" className="gcm-label">URL de imagen del premio</label>
+              <input
+                id="gcm-prize-image"
+                type="url"
+                value={formData.prizeImageUrl}
+                onChange={(e) => setFormData({...formData, prizeImageUrl: e.target.value})}
+                className="gcm-input"
+                placeholder="https://ejemplo.com/imagen-premio.jpg"
+              />
+              <p className="gcm-help-text">Ingresa la URL de una imagen para mostrar el premio (opcional)</p>
+            </div>
+
+            {formData.prizeImageUrl && (
+              <div className="gcm-full" style={{ marginTop: '1rem' }}>
+                <p className="gcm-label">Previsualización de la imagen</p>
+                <div style={{ marginTop: '0.5rem', borderRadius: '0.5rem', overflow: 'hidden', border: '2px solid #e5e7eb', maxWidth: '320px' }}>
+                  <img
+                    src={formData.prizeImageUrl}
+                    alt="Vista previa del premio"
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', padding: '1rem', color: '#9ca3af', fontSize: '0.875rem', gap: '0.5rem' }}>
+                    <FontAwesomeIcon icon={faLink} />
+                    <span>No se pudo cargar la imagen</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Patrón personalizado */}}
+          {!raffleConfigMode && (
           <div className="gcm-section">
             <div className="gcm-custom-header">
               <h3 className="gcm-section-title">Patrón Personalizado</h3>
@@ -369,15 +452,20 @@ const GameCreationModal = ({ onCreateGame, onClose }) => {
               </div>
             )}
           </div>
+          )}
 
-          {/* Botones de acción */}
+          {/* Botones de acción */}}
           <div className="gcm-actions">
             <button
               type="submit"
-              disabled={!formData.name.trim() || (formData.winPatterns.length === 0 && !formData.enableCustomPattern)}
+              disabled={
+                raffleConfigMode
+                  ? !formData.winPatterns[0] || !formData.prize.trim()
+                  : !formData.name.trim() || (formData.winPatterns.length === 0 && !formData.enableCustomPattern)
+              }
               className="gcm-submit-button"
             >
-              Crear Juego
+              {raffleConfigMode ? 'Guardar Configuración' : 'Crear Juego'}
             </button>
             <button
               type="button"
