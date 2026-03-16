@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHome, 
@@ -227,6 +227,7 @@ PatternProgress.displayName = 'PatternProgress';
 // ============= COMPONENTE PRINCIPAL =============
 
 const BingoPlayerContent = () => {
+  const navigate = useNavigate();
   const { player, logoutPlayer, updatePlayerCard, updatePlayerPattern } = usePlayerAuth();
   const { getGameById } = useGameManager();
   const { getAssignmentsByRaffle } = useBingoAdmin();
@@ -238,6 +239,11 @@ const BingoPlayerContent = () => {
   const [calledNumbers, setCalledNumbers] = useState([]);
   const [showWinnerModal, setShowWinnerModal] = useState(false);
   const [winnerData, setWinnerData] = useState(null);
+
+  const handleLogout = () => {
+    logoutPlayer();
+    window.location.reload();
+  };
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const currentRaffle = currentGame?.currentRaffle || 1;
@@ -457,7 +463,7 @@ const BingoPlayerContent = () => {
           </p>
           <div className="space-y-3">
             <button
-              onClick={logoutPlayer}
+              onClick={handleLogout}
               className="w-full bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 px-6 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg"
             >
               Volver al Login
@@ -526,7 +532,7 @@ const BingoPlayerContent = () => {
                 <span className="hidden sm:inline ml-2">Inicio</span>
               </Link>
               <button
-                onClick={logoutPlayer}
+                onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-all font-semibold shadow-md"
               >
                 <FontAwesomeIcon icon={faSignOutAlt} />

@@ -312,7 +312,7 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
           </div>
           )}
 
-          {/* Patrones de victoria */}}
+          {/* Patrones de victoria */}
           <div className="gcm-section">
             <h3 className="gcm-section-title">
               <FontAwesomeIcon icon={faThLarge} className="mr-2" />
@@ -401,7 +401,7 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
             )}
           </div>
 
-          {/* Patrón personalizado */}}
+          {/* Patrón personalizado */}
           {!raffleConfigMode && (
           <div className="gcm-section">
             <div className="gcm-custom-header">
@@ -454,7 +454,7 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
           </div>
           )}
 
-          {/* Botones de acción */}}
+          {/* Botones de acción */}
           <div className="gcm-actions">
             <button
               type="submit"

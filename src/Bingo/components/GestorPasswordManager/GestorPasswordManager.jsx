@@ -5,18 +5,18 @@ import {
   faEdit, 
   faTrash, 
   faTimes, 
-  faKey, 
   faEye,
   faEyeSlash,
   faCopy,
-  faCheck
+  faCheck,
+  faKey
 } from '@fortawesome/free-solid-svg-icons';
 import './GestorPasswordManager.css';
 
 const formInitialState = {
   showForm: false,
   editingPassword: null,
-  formData: { gestorName: '', password: '', gameId: '', description: '', isActive: true },
+  formData: { gestorName: '', password: '', description: '', isActive: true },
   passwordVisibility: {},
   copiedPasswords: {},
 };
@@ -24,7 +24,7 @@ function formReducer(state, patch) {
   return { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
 }
 
-const GestorPasswordForm = ({ showForm, editingPassword, formData, setFormData, games, onSubmit, onCancel, generatePassword }) => {
+const GestorPasswordForm = ({ showForm, editingPassword, formData, setFormData, onSubmit, onCancel, generatePassword }) => {
   if (!showForm) return null;
   return (
     <div className="gpm-form-container">
@@ -70,22 +70,6 @@ const GestorPasswordForm = ({ showForm, editingPassword, formData, setFormData, 
         </div>
         <div className="gpm-form-grid">
           <div>
-            <label htmlFor="gpm-game-id" className="gpm-label">Asignar a Juego (Opcional)</label>
-            <select
-              id="gpm-game-id"
-              value={formData.gameId}
-              onChange={(e) => setFormData({ ...formData, gameId: e.target.value })}
-              className="gpm-select"
-            >
-              <option value="">Sin asignar a juego específico</option>
-              {games.map(game => (
-                <option key={game.id} value={game.id}>
-                  {game.name} ({game.status}) {game.gestorPassword ? '🔐' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
             <p className="gpm-label">Estado</p>
             <label className="gpm-checkbox-label">
               <input
@@ -122,7 +106,7 @@ const GestorPasswordForm = ({ showForm, editingPassword, formData, setFormData, 
   );
 };
 
-const GestorPasswordTable = ({ passwords, showPassword, copiedPasswords, onToggleVisibility, onCopy, onToggleStatus, onEdit, onDelete, getGameName, onNew }) => {
+const GestorPasswordTable = ({ passwords, showPassword, copiedPasswords, onToggleVisibility, onCopy, onToggleStatus, onEdit, onDelete, onNew }) => {
   if (passwords.length === 0) {
     return (
       <div className="gpm-empty-state">
@@ -143,7 +127,6 @@ const GestorPasswordTable = ({ passwords, showPassword, copiedPasswords, onToggl
           <tr>
             <th className="gpm-th">Gestor</th>
             <th className="gpm-th">Contraseña</th>
-            <th className="gpm-th">Juego Asignado</th>
             <th className="gpm-th">Estado</th>
             <th className="gpm-th">Creado</th>
             <th className="gpm-th">Acciones</th>
@@ -169,7 +152,6 @@ const GestorPasswordTable = ({ passwords, showPassword, copiedPasswords, onToggl
                   </button>
                 </div>
               </td>
-              <td className="gpm-td">{password.gameId ? getGameName(password.gameId) : 'Sin asignar'}</td>
               <td className="gpm-td">
                 <button onClick={() => onToggleStatus(password.id)} className={`gpm-status-badge ${password.isActive ? 'gpm-status-active' : 'gpm-status-inactive'}`}>
                   {password.isActive ? 'Activa' : 'Inactiva'}
@@ -194,7 +176,7 @@ const GestorPasswordTable = ({ passwords, showPassword, copiedPasswords, onToggl
   );
 };
 
-const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
+const GestorPasswordManager = ({ onClose, embedded = false }) => {
   const [passwords, setPasswords] = useState([]);
   const [formState, dispatchForm] = useReducer(formReducer, formInitialState);
   const { showForm, editingPassword, formData, passwordVisibility: showPassword, copiedPasswords } = formState;
@@ -255,23 +237,13 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
     }
 
     savePasswords(updatedPasswords);
-
-    if (formData.gameId) {
-      onUpdateGestorPassword(formData.gameId, formData.password, formData.gestorName);
-    }
-
     resetForm();
   };
 
   const handleDelete = (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta contraseña?')) {
-      const passwordToDelete = passwords.find(pwd => pwd.id === id);
       const updatedPasswords = passwords.filter(pwd => pwd.id !== id);
       savePasswords(updatedPasswords);
-
-      if (passwordToDelete.gameId) {
-        onUpdateGestorPassword(passwordToDelete.gameId, null, '');
-      }
     }
   };
 
@@ -285,7 +257,6 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
     setFormData({
       gestorName: '',
       password: '',
-      gameId: '',
       description: '',
       isActive: true
     });
@@ -319,27 +290,9 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
     savePasswords(updatedPasswords);
   };
 
-  const getGameName = (gameId) => {
-    const game = games.find(g => g.id === gameId);
-    if (!game) return 'Juego no encontrado';
-    
-    const hasPassword = game.gestorPassword;
-    return (
-      <span className="gpm-game-name">
-        {game.name}
-        {hasPassword && (
-          <span className="gpm-game-badge">
-            <FontAwesomeIcon icon={faKey} className="mr-1" />
-            Con contraseña
-          </span>
-        )}
-      </span>
-    );
-  };
-
   return (
-    <div className="gpm-overlay">
-      <div className="gpm-container">
+    <div className={embedded ? undefined : 'gpm-overlay'}>
+      <div className={embedded ? 'gpm-container-embedded' : 'gpm-container'}>
         {/* Header */}
         <div className="gpm-header">
           <div className="gpm-header-content">
@@ -347,9 +300,11 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
               <h2 className="gpm-title">Gestión de Contraseñas de Gestores</h2>
               <p className="gpm-subtitle">Administra las credenciales de acceso para gestores</p>
             </div>
-            <button onClick={onClose} className="gpm-close-button">
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
+            {!embedded && (
+              <button onClick={onClose} className="gpm-close-button">
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -367,7 +322,6 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
             editingPassword={editingPassword}
             formData={formData}
             setFormData={setFormData}
-            games={games}
             onSubmit={handleSubmit}
             onCancel={resetForm}
             generatePassword={generatePassword}
@@ -389,7 +343,6 @@ const GestorPasswordManager = ({ games, onUpdateGestorPassword, onClose }) => {
               onToggleStatus={togglePasswordStatus}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              getGameName={getGameName}
               onNew={() => setShowForm(true)}
             />
           </div>

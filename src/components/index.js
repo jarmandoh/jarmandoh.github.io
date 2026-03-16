@@ -1,5 +1,4 @@
 export { default as About } from './About.jsx';
-export { default as BannerComponent } from './BannerComponent.jsx';
 export { default as ContactSection } from './ContactSection.jsx';
 export { default as ErrorBoundary } from './ErrorBoundary.jsx';
 export { default as Footer } from './Footer.jsx';
@@ -8,5 +7,4 @@ export { default as ImageComponent } from './ImageComponent.jsx';
 export { default as Navbar } from './Navbar.jsx';
 export { default as ProjectCard } from './ProjectCard.jsx';
 export { default as ProjectsSection } from './ProjectsSection.jsx';
-export { default as SkillsCard } from './SkillsCard.jsx';
 export { default as SkillsSection } from './SkillsSection.jsx';

@@ -17,7 +17,6 @@ const GestorLogin = () => {
   const { loginGestor } = useGestorAuth();
   const { games } = useGameManager();
   const [formData, setFormData] = useState({
-    gameId: '',
     password: '',
     gestorName: ''
   });
@@ -40,9 +39,6 @@ const GestorLogin = () => {
     setLoading(true);
 
     try {
-      if (!formData.gameId) {
-        throw new Error('Selecciona un juego');
-      }
       if (!formData.password.trim()) {
         throw new Error('Ingresa la contraseña');
       }
@@ -50,7 +46,12 @@ const GestorLogin = () => {
         throw new Error('Ingresa tu nombre');
       }
 
-      const result = await loginGestor(formData.gameId, formData.password.trim(), formData.gestorName.trim());
+      const matchingGame = availableGames.find(g => g.gestorPassword === formData.password.trim());
+      if (!matchingGame) {
+        throw new Error('Contraseña incorrecta o sin juego activo disponible');
+      }
+
+      const result = await loginGestor(matchingGame.id, formData.password.trim(), formData.gestorName.trim());
       console.log('Login exitoso:', result);
       
       // Forzar recarga de la página para que el componente padre detecte el cambio
@@ -95,28 +96,6 @@ const GestorLogin = () => {
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="gestor-form">
-          {/* Selector de Juego */}
-          <div>
-            <label htmlFor="gestor-game-id" className="gestor-label">
-              Juego Asignado
-            </label>
-            <select
-              id="gestor-game-id"
-              name="gameId"
-              value={formData.gameId}
-              onChange={handleInputChange}
-              className="gestor-select"
-              disabled={availableGames.length === 0}
-            >
-              <option value="">Selecciona el juego</option>
-              {availableGames.map(game => (
-                <option key={game.id} value={game.id}>
-                  {game.name} (ID: {game.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Nombre del Gestor */}
           <div>
             <label htmlFor="gestor-name" className="gestor-label">
@@ -171,6 +150,7 @@ const GestorLogin = () => {
               type="submit"
               disabled={loading || availableGames.length === 0}
               className="gestor-submit-button"
+              title={availableGames.length === 0 ? 'No hay juegos activos con gestor habilitado' : ''}
             >
               {loading ? 'Verificando...' : 'Acceder al Sorteo'}
             </button>

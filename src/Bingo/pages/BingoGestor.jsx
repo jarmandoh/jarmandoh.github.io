@@ -10,6 +10,7 @@ import {
   faTrophy,
   faPlay,
   faPause,
+  faStop,
   faClock,
   faCheckCircle,
   faPlus,
@@ -26,6 +27,7 @@ import BingoControls from '../components/BingoControls';
 import AssignmentForm from '../components/AssignmentForm';
 import AssignmentStats from '../components/AssignmentStats';
 import GameStats from '../components/GameStats';
+import GameCreationModal from '../components/GameCreationModal';
 import { SocketProvider } from '../context/SocketContext';
 
 const BINGO_COLUMNS = [
@@ -35,6 +37,84 @@ const BINGO_COLUMNS = [
   { letter: 'G', start: 46, color: 'yellow' },
   { letter: 'O', start: 61, color: 'purple' },
 ];
+
+const GestorGamesSection = ({ games, currentGame, onCreateGame, onStartGame, onFinishGame, onDeleteGame, onSelectGame, onShowGameForm }) => (
+  <>
+    <div className="bg-white rounded-xl shadow-2xl overflow-hidden mb-6">
+      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+        <h2 className="text-2xl font-semibold text-gray-800">Gestión de Juegos ({games.length})</h2>
+        <button
+          onClick={onShowGameForm}
+          className="bg-green-200 hover:bg-green-300 text-green-800 px-4 py-2 rounded-lg transition-colors inline-flex items-center"
+        >
+          <FontAwesomeIcon icon={faPlus} className="mr-2" />
+          Crear Juego
+        </button>
+      </div>
+      {games.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                {['Nombre', 'Estado', 'Creado', 'N\u00fameros', 'Acciones'].map(h => (
+                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {games.map((game) => (
+                <tr key={game.id} className={`hover:bg-gray-50 ${currentGame?.id === game.id ? 'bg-purple-50 border-l-4 border-purple-500' : ''}`}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{game.name}</div>
+                    {currentGame?.id === game.id && <div className="text-xs text-purple-600 font-semibold">Juego activo del sorteo</div>}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      game.status === 'active' ? 'bg-green-200 text-green-800' :
+                      game.status === 'waiting' ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-800'
+                    }`}>
+                      {game.status === 'active' ? 'Activo' : game.status === 'waiting' ? 'En Espera' : 'Finalizado'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(game.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{game.calledNumbers?.length || 0}/75</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex gap-2">
+                      {game.status === 'waiting' && (
+                        <button onClick={() => onStartGame(game.id)} className="text-green-600 hover:text-green-900" title="Iniciar juego">
+                          <FontAwesomeIcon icon={faPlay} />
+                        </button>
+                      )}
+                      {game.status === 'active' && (
+                        <button onClick={() => onFinishGame(game.id)} className="text-red-600 hover:text-red-900" title="Finalizar juego">
+                          <FontAwesomeIcon icon={faStop} />
+                        </button>
+                      )}
+                      {game.status !== 'active' && (
+                        <button onClick={() => onDeleteGame(game.id)} className="text-red-600 hover:text-red-900" title="Eliminar juego">
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-6xl text-gray-300 mb-4">🎮</div>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">No hay juegos creados</h3>
+          <p className="text-gray-500 mb-4">Crea el primer juego para comenzar</p>
+          <button onClick={onShowGameForm} className="bg-green-200 hover:bg-green-300 text-green-800 px-6 py-3 rounded-lg transition-colors">
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />Crear Primer Juego
+          </button>
+        </div>
+      )}
+    </div>
+  </>
+);
 
 const GestorBallBoard = ({ calledNumbers }) => (
   <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
@@ -337,6 +417,17 @@ const GestorViewControls = ({ viewMode, setViewMode, currentRaffle, isCardLimitR
           Control del Juego
         </button>
         <button
+          onClick={() => setViewMode('games')}
+          className={`px-4 py-2 rounded-lg transition duration-300 ${
+            viewMode === 'games'
+              ? 'bg-purple-200 text-purple-800 font-semibold'
+              : 'bg-white text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <FontAwesomeIcon icon={faPlay} className="mr-2" />
+          Juegos
+        </button>
+        <button
           onClick={() => setViewMode('assignments')}
           className={`px-4 py-2 rounded-lg transition duration-300 ${
             viewMode === 'assignments'
@@ -550,6 +641,8 @@ const BingoGestorContent = () => {
     setShowForm, setEditingAssignment, setViewMode, setSearchQuery,
     assignments, filteredAssignments, searchResults, assignedCards,
     maxCards, isCardLimitReached,
+    games, showGameForm, setShowGameForm,
+    handleCreateGame, handleStartGame, handleFinishGame, handleDeleteGame, handleSelectGame,
     handleFormSubmit, handleEdit, handleDelete, handleCallNumber,
     handleMarkWinner, handleTogglePaid, handlePauseGame, handleResumeGame,
     handleSaveRaffleConfig, handleResetRaffle, handleLogout, handleTestAssignment,
@@ -658,6 +751,19 @@ const BingoGestorContent = () => {
             onTestAssignment={handleTestAssignment}
           />
 
+          {/* Vista de Juegos */}
+          {viewMode === 'games' && (
+            <GestorGamesSection
+              games={games}
+              currentGame={currentGame}
+              onStartGame={handleStartGame}
+              onFinishGame={handleFinishGame}
+              onDeleteGame={handleDeleteGame}
+              onSelectGame={handleSelectGame}
+              onShowGameForm={() => setShowGameForm(true)}
+            />
+          )}
+
           {/* Controles del Juego */}
           {viewMode === 'game' && (
             <GestorGameControls
@@ -707,6 +813,14 @@ const BingoGestorContent = () => {
               searchResults={searchResults}
               onEdit={handleEdit}
               onDelete={handleDelete}
+            />
+          )}
+
+          {/* Modal para crear juego */}
+          {showGameForm && (
+            <GameCreationModal
+              onCreateGame={handleCreateGame}
+              onClose={() => setShowGameForm(false)}
             />
           )}
 

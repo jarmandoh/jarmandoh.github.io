@@ -26,7 +26,7 @@ const Hero = () => {
       />
 
       {/* Overlay oscuro */}
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-black/75 via-gray-900/80 to-black/70" />
+      <div aria-hidden="true" className="absolute inset-0 bg-linear-to-br from-black/75 via-gray-900/80 to-black/70" />
 
       {/* Contenido */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">

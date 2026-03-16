@@ -22,6 +22,7 @@ const gestorUiInitial = {
   editingAssignment: null,
   viewMode: 'game',
   searchQuery: '',
+  showGameForm: false,
 };
 
 function mergeReducer(state, patch) {
@@ -30,7 +31,7 @@ function mergeReducer(state, patch) {
 
 export function useGestorGame() {
   const { gestor, logoutGestor, getTimeUntilExpiry } = useGestorAuth();
-  const { getGameById, updateGame, addCalledNumber, checkWinPattern } = useGameManager();
+  const { games, getGameById, updateGame, addCalledNumber, checkWinPattern, createGame, startGame, finishGame, deleteGame } = useGameManager();
   const { assignCard, updateAssignment, removeAssignment, getAssignmentsByRaffle } = useBingoAdmin();
   const { socket, error, clearError } = useSocket();
 
@@ -49,11 +50,12 @@ export function useGestorGame() {
   const setShowAutoWinnersAlert = (val) => dispatchWinner({ showAutoWinnersAlert: val });
 
   const [gestorUiState, dispatchGestorUI] = useReducer(mergeReducer, gestorUiInitial);
-  const { showForm, editingAssignment, viewMode, searchQuery } = gestorUiState;
+  const { showForm, editingAssignment, viewMode, searchQuery, showGameForm } = gestorUiState;
   const setShowForm = (val) => dispatchGestorUI({ showForm: val });
   const setEditingAssignment = (val) => dispatchGestorUI({ editingAssignment: typeof val === 'function' ? val(gestorUiState.editingAssignment) : val });
   const setViewMode = (val) => dispatchGestorUI({ viewMode: val });
   const setSearchQuery = (val) => dispatchGestorUI({ searchQuery: val });
+  const setShowGameForm = (val) => dispatchGestorUI({ showGameForm: val });
 
   useEffect(() => {
     document.title = 'Gestor | Bingo Game';
@@ -351,6 +353,37 @@ export function useGestorGame() {
     }
   };
 
+  const handleCreateGame = (gameData) => {
+    createGame(gameData);
+    setShowGameForm(false);
+  };
+
+  const handleStartGame = (gameId) => {
+    startGame(gameId);
+    const updatedGame = getGameById(gameId);
+    if (currentGame?.id === gameId) setCurrentGame({ ...currentGame, status: 'active' });
+    else if (!currentGame) setCurrentGame(updatedGame);
+  };
+
+  const handleFinishGame = (gameId) => {
+    if (window.confirm('¿Estás seguro de que quieres finalizar este juego?')) {
+      finishGame(gameId);
+      if (currentGame?.id === gameId) setCurrentGame({ ...currentGame, status: 'finished' });
+    }
+  };
+
+  const handleDeleteGame = (gameId) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este juego permanentemente?')) {
+      deleteGame(gameId);
+      if (currentGame?.id === gameId) setCurrentGame(null);
+    }
+  };
+
+  const handleSelectGame = (gameId) => {
+    const game = getGameById(gameId);
+    if (game) setCurrentGame(game);
+  };
+
   const handleTestAssignment = () => {
     const testAssignment = {
       id: crypto.randomUUID(),
@@ -384,6 +417,14 @@ export function useGestorGame() {
     // Derived
     assignments, filteredAssignments, searchResults, assignedCards,
     maxCards, isCardLimitReached,
+    // Game management
+    games,
+    showGameForm, setShowGameForm,
+    handleCreateGame,
+    handleStartGame,
+    handleFinishGame,
+    handleDeleteGame,
+    handleSelectGame,
     // Handlers
     handleFormSubmit,
     handleEdit,

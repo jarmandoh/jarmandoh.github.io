@@ -162,52 +162,9 @@ const PlayerLogin = ({ onLogin }) => {
               </button>
             </form>
 
-            {/* Juegos disponibles */}
-            {(activeGames.length > 0 || waitingGames.length > 0) && (
-              <div className="player-games-section">
-                <h3 className="player-games-title">
-                  Juegos Disponibles
-                </h3>
-                
-                <div className="player-games-list">
-                  {/* Juegos activos */}
-                  {activeGames.map(game => (
-                    <div key={game.id} className="player-game-card player-game-active">
-                      <div className="player-game-info">
-                        <div className="player-game-name">{game.name}</div>
-                        <div className="player-game-status">
-                          🟢 En progreso • {game.calledNumbers.length}/75 números
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => joinGame(game.id)}
-                        className="player-game-button player-game-button-active"
-                      >
-                        Unirse
-                      </button>
-                    </div>
-                  ))}
-                  
-                  {/* Juegos esperando */}
-                  {waitingGames.map(game => (
-                    <div key={game.id} className="player-game-card player-game-waiting">
-                      <div className="player-game-info">
-                        <div className="player-game-name">{game.name}</div>
-                        <div className="player-game-status">
-                          ⏳ Esperando inicio • {game.currentPlayers}/{game.maxPlayers} jugadores
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => joinGame(game.id)}
-                        className="player-game-button player-game-button-waiting"
-                      >
-                        Unirse
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* TODO: Resultados de juegos */}
+            
+            
 
             {/* Información adicional */}
             <div className="player-info-box">
