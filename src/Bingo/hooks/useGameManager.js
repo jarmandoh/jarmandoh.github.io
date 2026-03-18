@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { checkCardPattern } from '../utils/checkWinPattern';
 
 // Hook para gestionar juegos y sorteos
 export const useGameManager = () => {
@@ -12,7 +13,12 @@ export const useGameManager = () => {
   useEffect(() => {
     const storedGames = localStorage.getItem(GAMES_STORAGE_KEY);
     if (storedGames) {
-      setGames(JSON.parse(storedGames));
+      try {
+        setGames(JSON.parse(storedGames));
+      } catch {
+        console.error('Estado de juegos corrupto en localStorage, reiniciando…');
+        localStorage.removeItem(GAMES_STORAGE_KEY);
+      }
     }
   }, []);
 
@@ -181,118 +187,18 @@ export const useGameManager = () => {
     };
   }, [getGameById]);
 
-  // Función para configurar contraseña de gestor
-  const setGestorPassword = useCallback((gameId, password, gestorName = '') => {
+  // Función para configurar contraseña de gestor (almacena hash SHA-256)
+  const setGestorPassword = useCallback(async (gameId, password, gestorName = '') => {
+    const { hashPassword } = await import('../utils/hashPassword');
+    const hashedPassword = await hashPassword(password);
     const updatedGames = games.map(game => 
       game.id === gameId 
-        ? { ...game, gestorPassword: password, gestorName: gestorName }
+        ? { ...game, gestorPassword: hashedPassword, gestorName: gestorName }
         : game
     );
     saveGames(updatedGames);
     return updatedGames.find(game => game.id === gameId);
   }, [games]);
-
-  // Función para validar patrones de victoria
-  const checkWinPattern = useCallback((markedNumbers, patternType, customPattern = null) => {
-    // Convierte los números marcados a una matriz 5x5
-    const cardGrid = Array(25).fill(false);
-    markedNumbers.forEach(num => {
-      // Lógica para mapear números del bingo a posiciones de la carta
-      // Esta es una implementación básica, se puede ajustar según la lógica del cartón
-      const index = num - 1; // Ajustar según la lógica de mapeo real
-      if (index >= 0 && index < 25) {
-        cardGrid[index] = true;
-      }
-    });
-
-    // El centro siempre está marcado (FREE)
-    cardGrid[12] = true;
-
-    switch (patternType) {
-      // Líneas horizontales específicas
-      case 'horizontalLine1':
-        return cardGrid.slice(0, 5).every(cell => cell);
-      case 'horizontalLine2':
-        return cardGrid.slice(5, 10).every(cell => cell);
-      case 'horizontalLine3':
-        return cardGrid.slice(10, 15).every(cell => cell);
-      case 'horizontalLine4':
-        return cardGrid.slice(15, 20).every(cell => cell);
-      case 'horizontalLine5':
-        return cardGrid.slice(20, 25).every(cell => cell);
-
-      // Columnas verticales (Letra I)
-      case 'letterI1':
-        return [0, 5, 10, 15, 20].every(i => cardGrid[i]);
-      case 'letterI2':
-        return [1, 6, 11, 16, 21].every(i => cardGrid[i]);
-      case 'letterI3':
-        return [2, 7, 12, 17, 22].every(i => cardGrid[i]);
-      case 'letterI4':
-        return [3, 8, 13, 18, 23].every(i => cardGrid[i]);
-      case 'letterI5':
-        return [4, 9, 14, 19, 24].every(i => cardGrid[i]);
-
-      case 'line': {
-        // Verificar líneas horizontales y verticales (mantener para compatibilidad)
-        for (let i = 0; i < 5; i++) {
-          // Líneas horizontales
-          if (cardGrid.slice(i * 5, (i + 1) * 5).every(cell => cell)) return true;
-          // Líneas verticales
-          if ([0, 1, 2, 3, 4].every(row => cardGrid[row * 5 + i])) return true;
-        }
-        return false;
-      }
-
-      case 'diagonal': {
-        // Diagonal principal
-        const mainDiagonal = [0, 6, 12, 18, 24].every(i => cardGrid[i]);
-        // Diagonal secundaria
-        const antiDiagonal = [4, 8, 12, 16, 20].every(i => cardGrid[i]);
-        return mainDiagonal || antiDiagonal;
-      }
-
-      case 'fourCorners':
-        return cardGrid[0] && cardGrid[4] && cardGrid[20] && cardGrid[24];
-
-      case 'letterX': {
-        const mainDiag = [0, 6, 12, 18, 24].every(i => cardGrid[i]);
-        const antiDiag = [4, 8, 12, 16, 20].every(i => cardGrid[i]);
-        return mainDiag && antiDiag;
-      }
-
-      case 'letterT': {
-        const topRow = cardGrid.slice(0, 5).every(cell => cell);
-        const middleColumn = [2, 7, 12, 17, 22].every(i => cardGrid[i]);
-        return topRow && middleColumn;
-      }
-
-      case 'letterL': {
-        const leftColumn = [0, 5, 10, 15, 20].every(i => cardGrid[i]);
-        const bottomRow = cardGrid.slice(20, 25).every(cell => cell);
-        return leftColumn && bottomRow;
-      }
-
-      case 'cross': {
-        const middleRow = cardGrid.slice(10, 15).every(cell => cell);
-        const middleCol = [2, 7, 12, 17, 22].every(i => cardGrid[i]);
-        return middleRow && middleCol;
-      }
-
-      case 'fullCard':
-        return cardGrid.every(cell => cell);
-
-      case 'custom': {
-        if (!customPattern) return false;
-        return customPattern.every((required, index) => 
-          !required || cardGrid[index]
-        );
-      }
-
-      default:
-        return false;
-    }
-  }, []);
 
   return {
     games,
@@ -313,6 +219,6 @@ export const useGameManager = () => {
     setActiveGame,
     setCurrentGame: setActiveGame, // Alias para mantener compatibilidad
     setGestorPassword,
-    checkWinPattern
+    checkWinPattern: checkCardPattern
   };
 };

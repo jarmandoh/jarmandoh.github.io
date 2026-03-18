@@ -4,7 +4,7 @@ import GestorLogin from '../components/GestorLogin';
 import BingoGestor from './BingoGestor';
 
 const ProtectedBingoGestor = () => {
-  const { isAuthenticated, loading } = useGestorAuth();
+  const { isAuthenticated, loading, loginGestor } = useGestorAuth();
 
   useEffect(() => {
     document.title = isAuthenticated ? 'Gestor | Bingo Game' : 'Login Gestor | Bingo';
@@ -21,7 +21,7 @@ const ProtectedBingoGestor = () => {
     );
   }
 
-  return isAuthenticated ? <BingoGestor /> : <GestorLogin />;
+  return isAuthenticated ? <BingoGestor /> : <GestorLogin onLogin={loginGestor} />;
 };
 
 export default ProtectedBingoGestor;

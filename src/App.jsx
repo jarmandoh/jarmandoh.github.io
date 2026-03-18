@@ -26,6 +26,7 @@ const ReservasLanding = lazy(() => import('./Reservas/pages/ReservasLanding'));
 const ReservasCanchas = lazy(() => import('./Reservas/pages/ReservasCanchas'));
 const ReservasCrear = lazy(() => import('./Reservas/pages/ReservasCrear'));
 const ProtectedReservasAdmin = lazy(() => import('./Reservas/pages/ProtectedReservasAdmin'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
                       <Route path="/habilidades" element={<Skills />} />
                       <Route path="/contacto" element={<Contact />} />
                       <Route path="/politica" element={<PoliticaDatos />} />
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>
                   <Footer />

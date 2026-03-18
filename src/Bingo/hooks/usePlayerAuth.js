@@ -8,6 +8,7 @@ export const usePlayerAuth = () => {
   const [currentGame, setCurrentGame] = useState(null);
 
   const PLAYER_STORAGE_KEY = 'bingoPlayerAuth';
+  const PLAYER_SESSION_HOURS = 8; // Sesión de jugador válida por 8 horas
 
   useEffect(() => {
     checkStoredPlayer();
@@ -18,9 +19,14 @@ export const usePlayerAuth = () => {
       const storedPlayer = localStorage.getItem(PLAYER_STORAGE_KEY);
       if (storedPlayer) {
         const playerData = JSON.parse(storedPlayer);
-        setPlayer(playerData);
-        setCurrentGame(playerData.gameId);
-        setIsAuthenticated(true);
+        const now = new Date().getTime();
+        if (playerData.expiresAt && now > playerData.expiresAt) {
+          localStorage.removeItem(PLAYER_STORAGE_KEY);
+        } else {
+          setPlayer(playerData);
+          setCurrentGame(playerData.gameId);
+          setIsAuthenticated(true);
+        }
       }
     } catch (error) {
       console.error('Error al verificar jugador:', error);
@@ -38,7 +44,8 @@ export const usePlayerAuth = () => {
       cardNumber: playerData.cardNumber || null,
       winPattern: playerData.winPattern || null,
       winningNumbers: playerData.winningNumbers || [],
-      joinedAt: new Date().toISOString()
+      joinedAt: new Date().toISOString(),
+      expiresAt: new Date().getTime() + (PLAYER_SESSION_HOURS * 60 * 60 * 1000)
     };
     
     localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(playerInfo));

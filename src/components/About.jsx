@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useScrollAnimation, randomDirection } from '../hooks/useScrollAnimation';
 
 const About = () => {
+  const [titleRef, titleVisible] = useScrollAnimation();
+  const [bodyRef, bodyVisible] = useScrollAnimation();
+  const titleDir = useRef(randomDirection()).current;
+  const bodyDir = useRef(randomDirection()).current;
+
   return (
     <section id="acerca" className="py-20 bg-gray-900 text-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">Acerca de Mí</h2>
-        <div className="text-lg leading-relaxed text-gray-300 space-y-4">
+        <h2
+          ref={titleRef}
+          className={`text-4xl font-bold text-center mb-12 ${titleDir} ${titleVisible ? 'is-visible' : ''}`}
+        >
+          Acerca de Mí
+        </h2>
+        <div
+          ref={bodyRef}
+          className={`text-lg leading-relaxed text-gray-300 space-y-4 ${bodyDir} ${bodyVisible ? 'is-visible' : ''}`}
+          style={{ transitionDelay: '150ms' }}
+        >
           <p>
             Soy un desarrollador Fullstack con mas de 8 años de experiencia, especializado en el ecosistema JavaScript. Mi enfoque principal es crear aplicaciones robustas, de alto rendimiento y fáciles de mantener. Disfruto navegando entre el Frontend, donde priorizo la experiencia de usuario y la estética, y el Backend, donde aseguro la lógica de negocio y la eficiencia de las bases de datos.
           </p>

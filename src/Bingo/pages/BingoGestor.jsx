@@ -268,7 +268,7 @@ const GestorSearchView = ({ searchQuery, setSearchQuery, searchResults, onEdit, 
   </div>
 );
 
-const GestorWinnersAlert = ({ autoDetectedWinners, onDismiss, onConfirmWinner }) => (
+const GestorWinnersAlert = ({ autoDetectedWinners, onDismiss, onConfirmWinner, onDismissWinner }) => (
   <div className="fixed top-20 right-4 z-50 bg-green-400 border-4 border-green-600 rounded-xl p-6 shadow-2xl max-w-md animate-pulse">
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -284,23 +284,34 @@ const GestorWinnersAlert = ({ autoDetectedWinners, onDismiss, onConfirmWinner })
         </button>
       </div>
       <div className="max-h-64 overflow-y-auto bg-white/50 rounded-lg p-3 space-y-2">
-        {autoDetectedWinners.map((winner) => (
-          <div key={`${winner.assignmentId}-${winner.cardNumber}`} className="bg-white rounded-lg p-3 border-2 border-green-500">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-bold text-green-900">{winner.participantName}</p>
-                <p className="text-sm text-green-700">Cartón #{winner.cardNumber}</p>
-                <p className="text-xs text-green-600">Patrón: {winner.pattern}</p>
+        {autoDetectedWinners.map((winner) => {
+          const key = `${winner.assignmentId}-${winner.cardNumber}`;
+          return (
+            <div key={key} className="bg-white rounded-lg p-3 border-2 border-green-500">
+              <div className="flex justify-between items-center gap-2">
+                <div>
+                  <p className="font-bold text-green-900">{winner.participantName}</p>
+                  <p className="text-sm text-green-700">Cartón #{winner.cardNumber}</p>
+                  <p className="text-xs text-green-600">Patrón: {winner.pattern}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => onConfirmWinner(key, winner.assignmentId)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={() => onDismissWinner(key)}
+                    className="bg-white hover:bg-red-50 text-red-600 border border-red-400 px-3 py-1 rounded text-sm transition-colors"
+                  >
+                    Descartar
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => onConfirmWinner(`${winner.assignmentId}-${winner.cardNumber}`, winner.assignmentId)}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
-              >
-                Confirmar
-              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </div>
@@ -527,7 +538,7 @@ const GestorGameControls = ({
   onPause,
   onResume,
   onReset,
-  onCallNumber,
+  onDrawNumber,
   onConfigureRaffle,
 }) => (
   <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -567,10 +578,8 @@ const GestorGameControls = ({
           </div>
           {currentGame.status === 'active' && (
             <BingoControls
-              onCallNumber={onCallNumber}
+              onDrawNumber={onDrawNumber}
               calledNumbers={currentGame.calledNumbers || []}
-              currentRaffle={currentRaffle}
-              gameId={currentGame.id}
             />
           )}
           {currentGame.status === 'waiting' && (
@@ -632,7 +641,7 @@ const GestorAssignmentModal = ({ editingAssignment, assignedCards, onSubmit, onC
 
 const BingoGestorContent = () => {
   const {
-    gestor, timeLeft, socket, error, clearError,
+    gestor, timeLeft, socket, isConnected, error, clearError,
     currentGame, gameStats, currentRaffle, raffleConfig,
     showRaffleConfigModal, setShowRaffleConfigModal, setRaffleConfig,
     showWinnerNotification, winnerInfo, autoDetectedWinners, showAutoWinnersAlert,
@@ -643,8 +652,8 @@ const BingoGestorContent = () => {
     maxCards, isCardLimitReached,
     games, showGameForm, setShowGameForm,
     handleCreateGame, handleStartGame, handleFinishGame, handleDeleteGame, handleSelectGame,
-    handleFormSubmit, handleEdit, handleDelete, handleCallNumber,
-    handleMarkWinner, handleTogglePaid, handlePauseGame, handleResumeGame,
+    handleFormSubmit, handleEdit, handleDelete, handleCallNumber, handleDrawNumber,
+    handleMarkWinner, handleDismissWinner, handleTogglePaid, handlePauseGame, handleResumeGame,
     handleSaveRaffleConfig, handleResetRaffle, handleLogout, handleTestAssignment,
   } = useGestorGame();
 
@@ -678,7 +687,7 @@ const BingoGestorContent = () => {
         </div>
       )}
       {/* Indicador de estado de conexión */}
-      {socket && !socket.connected && (
+      {!isConnected && (
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 bg-white rounded-full"></span>
@@ -701,6 +710,7 @@ const BingoGestorContent = () => {
           autoDetectedWinners={autoDetectedWinners}
           onDismiss={() => setShowAutoWinnersAlert(false)}
           onConfirmWinner={handleMarkWinner}
+          onDismissWinner={handleDismissWinner}
         />
       )}
 
@@ -772,7 +782,7 @@ const BingoGestorContent = () => {
               onPause={handlePauseGame}
               onResume={handleResumeGame}
               onReset={handleResetRaffle}
-              onCallNumber={handleCallNumber}
+              onDrawNumber={handleDrawNumber}
               onConfigureRaffle={() => {
                 const raffleSettings = currentGame.raffleSettings?.[currentRaffle];
                 setRaffleConfig({

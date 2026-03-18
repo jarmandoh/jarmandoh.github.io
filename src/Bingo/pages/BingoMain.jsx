@@ -22,6 +22,7 @@ const BingoMainContent = () => {
   } = useBingo();
 
   const [showWinnerModal, setShowWinnerModal] = useState(false);
+  const [randomCardId] = useState(() => Math.floor(Math.random() * 1200) + 1);
 
   // Mostrar modal cuando hay ganadores
   useEffect(() => {
@@ -79,7 +80,7 @@ const BingoMainContent = () => {
               </Link>
             </div>
             <Link 
-              to={`/bingo/carton/${Math.floor(Math.random() * 1200) + 1}`}
+              to={`/bingo/carton/${randomCardId}`}
               className="bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-6 py-2 rounded-lg transition-all duration-300 inline-flex items-center font-bold shadow-lg transform hover:scale-105"
             >
               <FontAwesomeIcon icon={faRandom} className="mr-2" />
@@ -104,9 +105,7 @@ const BingoMainContent = () => {
             <div className="shrink-0">
               <BingoControls 
                 onDrawNumber={drawNumber}
-                onReset={handleResetGame}
-                isGameActive={isGameActive}
-                canDraw={getNextNumber() !== null}
+                calledNumbers={calledNumbers}
               />
             </div>
 

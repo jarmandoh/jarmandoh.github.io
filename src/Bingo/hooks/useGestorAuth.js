@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { hashPassword } from '../utils/hashPassword';
 
 export const useGestorAuth = () => {
   const [gestor, setGestor] = useState(null);
@@ -30,7 +31,7 @@ export const useGestorAuth = () => {
   }, []);
 
   const loginGestor = (gameId, password, gestorName) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         // Obtener el juego para verificar la contraseña
         const games = JSON.parse(localStorage.getItem('bingoGames') || '[]');
@@ -46,7 +47,8 @@ export const useGestorAuth = () => {
           return;
         }
 
-        if (game.gestorPassword !== password) {
+        const inputHash = await hashPassword(password);
+        if (game.gestorPassword !== inputHash) {
           reject(new Error('Contraseña incorrecta'));
           return;
         }
@@ -67,8 +69,7 @@ export const useGestorAuth = () => {
         setGestor(gestorSession);
         setIsAuthenticated(true);
         
-        console.log('Sesión de gestor creada:', gestorSession);
-        
+
         // Resolver después de actualizar el estado
         setTimeout(() => {
           resolve(gestorSession);

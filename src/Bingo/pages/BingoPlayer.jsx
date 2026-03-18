@@ -18,22 +18,12 @@ import { useSocket } from '../hooks/useSocket';
 import BingoCard from '../components/BingoCard';
 import WinnerModal from '../components/WinnerModal';
 import { SocketProvider } from '../context/SocketContext';
-import bingoCardsData from '../data/bingoCards.json';
+import { getColumnLetter, getColumnColor } from '../utils/bingoUtils';
 
 // ============= COMPONENTES OPTIMIZADOS =============
 
 // Componente de número actual con animación mejorada
 const CurrentNumberDisplay = React.memo(({ number }) => {
-  const getColumnLetter = (num) => {
-    if (!num) return '';
-    if (num >= 1 && num <= 15) return 'B';
-    if (num >= 16 && num <= 30) return 'I';
-    if (num >= 31 && num <= 45) return 'N';
-    if (num >= 46 && num <= 60) return 'G';
-    if (num >= 61 && num <= 75) return 'O';
-    return '';
-  };
-
   const letter = getColumnLetter(number);
   const colorClass = {
     'B': 'from-green-400 to-green-600 shadow-green-500/50',
@@ -72,11 +62,6 @@ const CalledNumbersStrip = React.memo(({ calledNumbers }) => {
   const [animatingNumber, setAnimatingNumber] = useState(null);
   const prevCalledNumbersRef = React.useRef([]);
 
-  // Debug: log cuando cambian los números
-  useEffect(() => {
-    console.log('CalledNumbersStrip actualizado:', calledNumbers.length, 'números');
-  }, [calledNumbers]);
-
   const mostRecent = useMemo(() => 
     calledNumbers.length > 0 ? calledNumbers[calledNumbers.length - 1] : null,
     [calledNumbers]
@@ -103,22 +88,6 @@ const CalledNumbersStrip = React.memo(({ calledNumbers }) => {
     }
     prevCalledNumbersRef.current = calledNumbers;
   }, [calledNumbers]);
-
-  const getColumnColor = (num) => {
-    if (num >= 1 && num <= 15) return 'bg-green-500';
-    if (num >= 16 && num <= 30) return 'bg-blue-500';
-    if (num >= 31 && num <= 45) return 'bg-red-500';
-    if (num >= 46 && num <= 60) return 'bg-yellow-500';
-    return 'bg-purple-500';
-  };
-
-  const getColumnLetter = (num) => {
-    if (num >= 1 && num <= 15) return 'B';
-    if (num >= 16 && num <= 30) return 'I';
-    if (num >= 31 && num <= 45) return 'N';
-    if (num >= 46 && num <= 60) return 'G';
-    return 'O';
-  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
@@ -345,9 +314,9 @@ const BingoPlayerContent = () => {
     }
   }, [getAssignmentsByRaffle, updatePlayerCard]);
 
-  const generatePlayerCardFromNumber = useCallback((cardNumber) => {
-    const cardData = bingoCardsData.find(card => card.id === cardNumber);
-    
+  const generatePlayerCardFromNumber = useCallback(async (cardNumber) => {
+    const { default: allCards } = await import('../data/bingoCards.json');
+    const cardData = allCards.find(card => card.id === cardNumber);
     if (cardData) {
       setPlayerCard(cardData.card);
     } else {

@@ -192,3 +192,24 @@ html {
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out;
 }
+
+/* =============================================
+   Animaciones scroll para viewport (portfolio)
+   ============================================= */
+.scroll-animate,
+.scroll-animate-left,
+.scroll-animate-right {
+  opacity: 0;
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+}
+
+.scroll-animate       { transform: translateY(48px); }
+.scroll-animate-left  { transform: translateX(-64px); }
+.scroll-animate-right { transform: translateX(64px); }
+
+.scroll-animate.is-visible,
+.scroll-animate-left.is-visible,
+.scroll-animate-right.is-visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}

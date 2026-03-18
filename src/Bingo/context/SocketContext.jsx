@@ -12,7 +12,6 @@ export const SocketProvider = ({ children }) => {
       connected: true,
       id: `socket_${Date.now()}`,
       emit: (event, data, callback) => {
-        console.log('Socket emit:', event, data);
         channel.postMessage({ type: event, data });
         setTimeout(() => {
           mockSocket._trigger(event, data);
@@ -24,7 +23,6 @@ export const SocketProvider = ({ children }) => {
         }
       },
       on: (event, callback) => {
-        console.log('Socket listening for:', event);
         if (!mockSocket._listeners[event]) {
           mockSocket._listeners[event] = [];
         }
@@ -35,7 +33,6 @@ export const SocketProvider = ({ children }) => {
         }
       },
       off: (event, callback) => {
-        console.log('Socket stop listening for:', event);
         if (mockSocket._listeners[event]) {
           if (callback) {
             mockSocket._listeners[event] = mockSocket._listeners[event].filter(cb => cb !== callback);
@@ -56,50 +53,57 @@ export const SocketProvider = ({ children }) => {
         }
       },
       disconnect: () => {
-        console.log('Socket disconnected');
         mockSocket.connected = false;
         mockSocket._trigger('disconnect');
         setIsConnected(false);
       },
       connect: () => {
-        console.log('Socket connecting...');
         mockSocket.connected = true;
         setIsConnected(true);
         mockSocket._trigger('connect');
-        console.log('Socket connected');
       }
     };
 
     // Escuchar mensajes de otras pestañas
     channel.onmessage = (msg) => {
       const { type, data } = msg.data;
-      console.log('Socket received from channel:', type, data);
       mockSocket._trigger(type, data);
     };
 
-    // Manejar errores del canal
+    // Manejar errores del canal → marcar como desconectado para que la UI lo refleje
     channel.onerror = (error) => {
       console.error('BroadcastChannel error:', error);
+      mockSocket.connected = false;
+      setIsConnected(false);
     };
 
     setSocket(mockSocket);
     setIsConnected(true);
+
+    // Sincronizar con el estado de red del navegador
+    const handleOffline = () => { mockSocket.connected = false; setIsConnected(false); };
+    const handleOnline  = () => { mockSocket.connect(); };
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online',  handleOnline);
 
     // Disparar evento de conexión inicial
     setTimeout(() => {
       mockSocket._trigger('connect');
     }, 100);
 
-    // Mantener conexión activa con heartbeat
+    // Mantener conexión activa con heartbeat.
+    // Se omite cuando la pestaña está en segundo plano para ahorrar recursos.
     const heartbeatInterval = setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
       if (!mockSocket.connected) {
-        console.log('Reconectando socket...');
         mockSocket.connect();
       }
     }, 5000); // Verificar cada 5 segundos
 
     return () => {
       clearInterval(heartbeatInterval);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online',  handleOnline);
       channel.close();
       if (mockSocket.connected) {
         mockSocket.disconnect();
@@ -115,24 +119,11 @@ export const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={value}>
       {children}
-      {/* Indicador de estado de conexión global (opcional) */}
-      {socket && !socket.connected && (
-        <div 
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '20px',
-            backgroundColor: '#ef4444',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            zIndex: 9999,
-            fontSize: '14px',
-            fontWeight: '500'
-          }}
-        >
-          🔌 Desconectado - Verificando conexión...
+      {/* Indicador de estado de conexión global */}
+      {!isConnected && (
+        <div className="fixed bottom-5 left-5 z-[9999] flex items-center gap-2 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-pulse">
+          <span className="inline-block w-2 h-2 bg-white rounded-full shrink-0" />
+          🔌 Desconectado — Verificando conexión...
         </div>
       )}
     </SocketContext.Provider>

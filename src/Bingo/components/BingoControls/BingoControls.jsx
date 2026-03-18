@@ -1,24 +1,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import { useBingo } from '../../hooks/useBingo';
 import './BingoControls.css';
 
-const BingoControls = ({ onCallNumber, calledNumbers, currentRaffle, gameId }) => {
-  const { drawNumber } = useBingo(gameId, calledNumbers);
+const BingoControls = ({ onDrawNumber, calledNumbers = [] }) => {
   const canDraw = calledNumbers.length < 75;
-
-  const handleDrawNumber = () => {
-    if (canDraw) {
-      // Sacar el número (drawNumber ahora devuelve el número sacado)
-      const drawnNumber = drawNumber(currentRaffle || 1);
-      
-      // Si se proporcionó callback, llamarlo con el número exacto que se sacó
-      if (drawnNumber && onCallNumber) {
-        onCallNumber(drawnNumber);
-      }
-    }
-  };
 
   return (
     <div className="bingo-controls">
@@ -26,7 +12,7 @@ const BingoControls = ({ onCallNumber, calledNumbers, currentRaffle, gameId }) =
       
       <div className="bingo-controls__buttons">
         <button
-          onClick={handleDrawNumber}
+          onClick={onDrawNumber}
           disabled={!canDraw}
           className={`bingo-controls__button bingo-controls__button--draw ${
             !canDraw ? 'bingo-controls__button--disabled' : ''

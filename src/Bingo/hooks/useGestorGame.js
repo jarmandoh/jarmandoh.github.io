@@ -4,58 +4,32 @@ import { useGestorAuth } from './useGestorAuth';
 import { useGameManager } from './useGameManager';
 import { useBingoAdmin } from './useBingoAdmin';
 import { useSocket } from './useSocket';
+import { checkCardPattern } from '../utils/checkWinPattern';
+import { useGestorGameState } from './useGestorGameState';
 
-const gameStateInitial = {
-  currentGame: null,
-  gameStats: { totalCards: 0, activeCards: 0, winners: 0 },
-  showRaffleConfigModal: false,
-  raffleConfig: { winPattern: '', prize: '', prizeImageUrl: '' },
-};
-const winnerStateInitial = {
-  showWinnerNotification: false,
-  winnerInfo: null,
-  autoDetectedWinners: [],
-  showAutoWinnersAlert: false,
-};
-const gestorUiInitial = {
-  showForm: false,
-  editingAssignment: null,
-  viewMode: 'game',
-  searchQuery: '',
-  showGameForm: false,
-};
-
-function mergeReducer(state, patch) {
-  return { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
+/** Safely read and parse the bingoAssignments array from localStorage. */
+function safeGetAssignments() {
+  try {
+    return JSON.parse(localStorage.getItem('bingoAssignments') || '[]');
+  } catch {
+    return [];
+  }
 }
 
 export function useGestorGame() {
   const { gestor, logoutGestor, getTimeUntilExpiry } = useGestorAuth();
-  const { games, getGameById, updateGame, addCalledNumber, checkWinPattern, createGame, startGame, finishGame, deleteGame } = useGameManager();
+  const { games, getGameById, updateGame, addCalledNumber, createGame, startGame, finishGame, deleteGame } = useGameManager();
   const { assignCard, updateAssignment, removeAssignment, getAssignmentsByRaffle } = useBingoAdmin();
-  const { socket, error, clearError } = useSocket();
+  const { socket, error, clearError, isConnected } = useSocket();
 
-  const [gameState, dispatchGame] = useReducer(mergeReducer, gameStateInitial);
-  const { currentGame, gameStats, showRaffleConfigModal, raffleConfig } = gameState;
-  const setCurrentGame = (val) => dispatchGame({ currentGame: typeof val === 'function' ? val(gameState.currentGame) : val });
-  const setGameStats = (val) => dispatchGame({ gameStats: typeof val === 'function' ? val(gameState.gameStats) : val });
-  const setShowRaffleConfigModal = (val) => dispatchGame({ showRaffleConfigModal: val });
-  const setRaffleConfig = (val) => dispatchGame({ raffleConfig: typeof val === 'function' ? val(gameState.raffleConfig) : val });
-
-  const [winnerState, dispatchWinner] = useReducer(mergeReducer, winnerStateInitial);
-  const { showWinnerNotification, winnerInfo, autoDetectedWinners, showAutoWinnersAlert } = winnerState;
-  const setShowWinnerNotification = (val) => dispatchWinner({ showWinnerNotification: val });
-  const setWinnerInfo = (val) => dispatchWinner({ winnerInfo: typeof val === 'function' ? val(winnerState.winnerInfo) : val });
-  const setAutoDetectedWinners = (val) => dispatchWinner({ autoDetectedWinners: typeof val === 'function' ? val(winnerState.autoDetectedWinners) : val });
-  const setShowAutoWinnersAlert = (val) => dispatchWinner({ showAutoWinnersAlert: val });
-
-  const [gestorUiState, dispatchGestorUI] = useReducer(mergeReducer, gestorUiInitial);
-  const { showForm, editingAssignment, viewMode, searchQuery, showGameForm } = gestorUiState;
-  const setShowForm = (val) => dispatchGestorUI({ showForm: val });
-  const setEditingAssignment = (val) => dispatchGestorUI({ editingAssignment: typeof val === 'function' ? val(gestorUiState.editingAssignment) : val });
-  const setViewMode = (val) => dispatchGestorUI({ viewMode: val });
-  const setSearchQuery = (val) => dispatchGestorUI({ searchQuery: val });
-  const setShowGameForm = (val) => dispatchGestorUI({ showGameForm: val });
+  const {
+    currentGame, gameStats, showRaffleConfigModal, raffleConfig,
+    setCurrentGame, setGameStats, setShowRaffleConfigModal, setRaffleConfig,
+    showWinnerNotification, winnerInfo, autoDetectedWinners, showAutoWinnersAlert,
+    setShowWinnerNotification, setWinnerInfo, setAutoDetectedWinners, setShowAutoWinnersAlert,
+    showForm, editingAssignment, viewMode, searchQuery, showGameForm,
+    setShowForm, setEditingAssignment, setViewMode, setSearchQuery, setShowGameForm,
+  } = useGestorGameState();
 
   useEffect(() => {
     document.title = 'Gestor | Bingo Game';
@@ -74,15 +48,7 @@ export function useGestorGame() {
         const cardData = bingoCardsData.find(card => card.id === cardNum);
         if (cardData) {
           for (const pattern of winPatterns) {
-            const markedNumbers = [];
-            cardData.card.forEach((row) => {
-              row.forEach((cell) => {
-                if (cell !== 'FREE' && updatedCalledNumbers.includes(cell)) {
-                  markedNumbers.push(cell);
-                }
-              });
-            });
-            if (checkWinPattern(markedNumbers, pattern)) {
+            if (checkCardPattern(cardData.card, updatedCalledNumbers, pattern)) {
               winners.push({
                 cardNumber: cardNum,
                 participantName: assignment.participantName,
@@ -97,7 +63,7 @@ export function useGestorGame() {
       }
     });
     return winners;
-  }, [currentGame, currentRaffle, getAssignmentsByRaffle, checkWinPattern]);
+  }, [currentGame, currentRaffle, getAssignmentsByRaffle]);
 
   const updateGameStats = useCallback(() => {
     const assignments = getAssignmentsByRaffle(currentRaffle);
@@ -248,7 +214,6 @@ export function useGestorGame() {
       const updatedCalledNumbers = updatedGame.calledNumbers || [];
       const winners = checkForWinners(updatedCalledNumbers);
       if (winners.length > 0) {
-        console.log('¡Ganadores detectados automáticamente!', winners);
         setAutoDetectedWinners(winners);
         setShowAutoWinnersAlert(true);
         setTimeout(() => setShowAutoWinnersAlert(false), 15000);
@@ -256,16 +221,39 @@ export function useGestorGame() {
     }, 5500);
   };
 
+  const handleDrawNumber = useCallback(() => {
+    if (!currentGame) return;
+    const called = currentGame.calledNumbers || [];
+    const remaining = Array.from({ length: 75 }, (_, i) => i + 1).filter(n => !called.includes(n));
+    if (remaining.length === 0) return;
+    const number = remaining[Math.floor(Math.random() * remaining.length)];
+    handleCallNumber(number);
+  }, [currentGame, handleCallNumber]);
+
   const handleMarkWinner = (participantId, assignmentId) => {
-    const stored = JSON.parse(localStorage.getItem('bingoAssignments') || '[]');
+    const stored = safeGetAssignments();
     localStorage.setItem('bingoAssignments', JSON.stringify(
       stored.map(a => a.id === assignmentId ? { ...a, winner: true } : a)
     ));
+    // Eliminar el ganador confirmado de la lista de auto-detectados
+    setAutoDetectedWinners(prev =>
+      prev.filter(w => `${w.assignmentId}-${w.cardNumber}` !== participantId)
+    );
     updateGameStats();
   };
 
+  /**
+   * Descarta un posible ganador auto-detectado sin confirmarlo.
+   * @param {string} key - clave única `${assignmentId}-${cardNumber}`
+   */
+  const handleDismissWinner = (key) => {
+    setAutoDetectedWinners(prev =>
+      prev.filter(w => `${w.assignmentId}-${w.cardNumber}` !== key)
+    );
+  };
+
   const handleTogglePaid = (assignmentId) => {
-    const stored = JSON.parse(localStorage.getItem('bingoAssignments') || '[]');
+    const stored = safeGetAssignments();
     localStorage.setItem('bingoAssignments', JSON.stringify(
       stored.map(a => a.id === assignmentId ? { ...a, paid: !a.paid } : a)
     ));
@@ -310,7 +298,7 @@ export function useGestorGame() {
     });
     setCurrentGame({ ...currentGame, raffleSettings, settings: updatedSettings, calledNumbers: [], currentNumber: null, winners: [], status: 'active' });
 
-    const stored = JSON.parse(localStorage.getItem('bingoAssignments') || '[]');
+    const stored = safeGetAssignments();
     localStorage.setItem('bingoAssignments', JSON.stringify(
       stored.map(a => a.raffleNumber === currentRaffle ? { ...a, winner: false } : a)
     ));
@@ -334,7 +322,7 @@ export function useGestorGame() {
       } else {
         console.warn('Socket no conectado, el reinicio solo es local');
       }
-      const stored = JSON.parse(localStorage.getItem('bingoAssignments') || '[]');
+      const stored = safeGetAssignments();
       localStorage.setItem('bingoAssignments', JSON.stringify(
         stored.map(a => a.raffleNumber === currentRaffle ? { ...a, winner: false } : a)
       ));
@@ -404,7 +392,7 @@ export function useGestorGame() {
 
   return {
     // Auth / session
-    gestor, timeLeft, socket, error, clearError,
+    gestor, timeLeft, socket, isConnected, error, clearError,
     // Game state
     currentGame, gameStats, currentRaffle, raffleConfig,
     showRaffleConfigModal, setShowRaffleConfigModal, setRaffleConfig,
@@ -430,7 +418,9 @@ export function useGestorGame() {
     handleEdit,
     handleDelete,
     handleCallNumber,
+    handleDrawNumber,
     handleMarkWinner,
+    handleDismissWinner,
     handleTogglePaid,
     handlePauseGame,
     handleResumeGame,

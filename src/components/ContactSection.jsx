@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faPhone, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { useScrollAnimation, randomDirection } from '../hooks/useScrollAnimation';
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -25,13 +26,30 @@ const ContactSection = () => {
     });
   };
 
+  const [titleRef, titleVisible] = useScrollAnimation();
+  const [formRef, formVisible] = useScrollAnimation();
+  const [infoRef, infoVisible] = useScrollAnimation();
+  const titleDir = useRef(randomDirection()).current;
+  const formDir = useRef(randomDirection()).current;
+  const infoDir = useRef(randomDirection()).current;
+
   return (
     <section id="contacto" className="py-20 bg-gray-900 text-white" aria-labelledby="contacto-heading" role="region">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 id="contacto-heading" className="text-4xl font-bold text-center mb-12">¿Listo para colaborar?</h2>
+        <h2
+          ref={titleRef}
+          id="contacto-heading"
+          className={`text-4xl font-bold text-center mb-12 ${titleDir} ${titleVisible ? 'is-visible' : ''}`}
+        >
+          ¿Listo para colaborar?
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Formulario de Contacto */}
-          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl">
+          <div
+            ref={formRef}
+            className={`bg-gray-800 p-8 rounded-xl shadow-2xl ${formDir} ${formVisible ? 'is-visible' : ''}`}
+            style={{ transitionDelay: '150ms' }}
+          >
             <h3 className="text-2xl font-semibold mb-6 text-indigo-500">Envíame un mensaje</h3>
             <form onSubmit={handleSubmit} aria-label="Formulario de contacto">
               {/* Mensaje de éxito */}
@@ -96,7 +114,11 @@ const ContactSection = () => {
           </div>
 
           {/* Información de Contacto y Redes */}
-          <div className="text-center md:text-left pt-8 md:pt-0">
+          <div
+            ref={infoRef}
+            className={`text-center md:text-left pt-8 md:pt-0 ${infoDir} ${infoVisible ? 'is-visible' : ''}`}
+            style={{ transitionDelay: '300ms' }}
+          >
             <h3 className="text-2xl font-semibold mb-6 text-indigo-500">O encuéntrame en:</h3>
             <p className="text-lg text-gray-300 mb-6">
               Siempre estoy abierto a discutir nuevos proyectos, ideas creativas o nuevas oportunidades.

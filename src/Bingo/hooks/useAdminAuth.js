@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
+import { hashPassword } from '../utils/hashPassword';
+
+// Hash SHA-256 de la contraseña de admin (configurado en .env.local).
+// Nunca almacenes la contraseña en texto plano.
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_BINGO_ADMIN_PASSWORD_HASH ?? '';
 
 // Hook para gestionar la autenticación del administrador
 export const useAdminAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Contraseña predeterminada (en un entorno real esto estaría en el backend)
-  const ADMIN_PASSWORD = 'bingoAdmin1234'; // Cambia esta contraseña por una más segura en producción
   const AUTH_STORAGE_KEY = 'bingoAdminAuth';
   const AUTH_EXPIRY_HOURS = 24; // Sesión válida por 24 horas
 
@@ -37,8 +40,9 @@ export const useAdminAuth = () => {
     }
   };
 
-  const login = (password) => {
-    if (password === ADMIN_PASSWORD) {
+  const login = async (password) => {
+    const inputHash = await hashPassword(password);
+    if (inputHash === ADMIN_PASSWORD_HASH) {
       const expiry = new Date().getTime() + (AUTH_EXPIRY_HOURS * 60 * 60 * 1000);
       const authData = {
         authenticated: true,

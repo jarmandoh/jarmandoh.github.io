@@ -1,5 +1,5 @@
 // Script para generar cartones de Bingo
-function generateBingoCard() {
+export function generateBingoCard() {
   const card = [];
   const ranges = [
     [1, 15],   // B

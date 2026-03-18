@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PlayerLogin from '../Fichas/components/PlayerLogin/PlayerLogin';
 
-describe('PlayerLogin', () => {
+describe('PlayerLogin (Fichas)', () => {
   it('muestra error si el nombre está vacío', () => {
     render(<PlayerLogin onLogin={jest.fn()} />);
     fireEvent.click(screen.getByText(/Entrar al Juego/i));

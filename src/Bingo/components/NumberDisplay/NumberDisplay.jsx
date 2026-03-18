@@ -1,16 +1,8 @@
 import React from 'react';
 import './NumberDisplay.css';
+import { getColumnLetter } from '../../utils/bingoUtils';
 
 const NumberDisplay = React.memo(({ currentNumber, calledNumbers }) => {
-  const getColumnLetter = (num) => {
-    if (num >= 1 && num <= 15) return 'B';
-    if (num >= 16 && num <= 30) return 'I';
-    if (num >= 31 && num <= 45) return 'N';
-    if (num >= 46 && num <= 60) return 'G';
-    if (num >= 61 && num <= 75) return 'O';
-    return '';
-  };
-
   return (
     <div className="number-display">
       <h2 className="number-display__title">Número Actual</h2>

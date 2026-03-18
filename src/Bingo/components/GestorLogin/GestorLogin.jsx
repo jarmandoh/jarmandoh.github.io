@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { hashPassword } from '../../utils/hashPassword';
 import { 
   faHome, 
   faEye, 
@@ -8,13 +9,10 @@ import {
   faListOl,
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
-import { useGestorAuth } from '../../hooks/useGestorAuth';
 import { useGameManager } from '../../hooks/useGameManager';
 import './GestorLogin.css';
 
-const GestorLogin = () => {
-  const navigate = useNavigate();
-  const { loginGestor } = useGestorAuth();
+const GestorLogin = ({ onLogin }) => {
   const { games } = useGameManager();
   const [formData, setFormData] = useState({
     password: '',
@@ -46,18 +44,15 @@ const GestorLogin = () => {
         throw new Error('Ingresa tu nombre');
       }
 
-      const matchingGame = availableGames.find(g => g.gestorPassword === formData.password.trim());
+      const inputHash = await hashPassword(formData.password.trim());
+      const matchingGame = availableGames.find(g => g.gestorPassword === inputHash);
       if (!matchingGame) {
         throw new Error('Contraseña incorrecta o sin juego activo disponible');
       }
 
-      const result = await loginGestor(matchingGame.id, formData.password.trim(), formData.gestorName.trim());
-      console.log('Login exitoso:', result);
-      
-      // Forzar recarga de la página para que el componente padre detecte el cambio
-      window.location.reload();
+      await onLogin(matchingGame.id, formData.password.trim(), formData.gestorName.trim());
+      setLoading(false);
     } catch (err) {
-      console.error('Error en login:', err);
       setError(err.message);
       setLoading(false);
     }

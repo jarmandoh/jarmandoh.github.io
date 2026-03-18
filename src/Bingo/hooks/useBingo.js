@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useSocket } from './useSocket';
 import bingoCardsData from '../data/bingoCards.json';
+import { generateBingoCard } from '../data/cardsGenerator';
+import { checkBingo } from '../utils/checkWinPattern';
 
 export const useBingo = (gameId = null, initialCalledNumbers = []) => {
   const [calledNumbers, setCalledNumbers] = useState(initialCalledNumbers);
@@ -17,73 +19,13 @@ export const useBingo = (gameId = null, initialCalledNumbers = []) => {
     }
   }, [initialCalledNumbers]);
 
-  // Generar cartón de Bingo
-  function generateBingoCard() {
-    const card = [];
-    const ranges = [
-      [1, 15],   // B
-      [16, 30],  // I
-      [31, 45],  // N
-      [46, 60],  // G
-      [61, 75]   // O
-    ];
-
-    for (let row = 0; row < 5; row++) {
-      const cardRow = [];
-      for (let col = 0; col < 5; col++) {
-        if (row === 2 && col === 2) {
-          // Centro libre
-          cardRow.push('FREE');
-        } else {
-          const [min, max] = ranges[col];
-          let num;
-          do {
-            num = Math.floor(Math.random() * (max - min + 1)) + min;
-          } while (cardRow.includes(num));
-          cardRow.push(num);
-        }
-      }
-      card.push(cardRow);
-    }
-    return card;
-  }
-
-  // Verificar si un cartón es ganador
-  const checkBingo = useCallback((card) => {
-    // Verificar filas
-    for (let row = 0; row < 5; row++) {
-      if (card[row].every(cell => cell === 'FREE' || calledNumbers.includes(cell))) {
-        return { type: 'row', position: row };
-      }
-    }
-
-    // Verificar columnas
-    for (let col = 0; col < 5; col++) {
-      if (card.every(row => row[col] === 'FREE' || calledNumbers.includes(row[col]))) {
-        return { type: 'column', position: col };
-      }
-    }
-
-    // Verificar diagonal principal (top-left to bottom-right)
-    if (card.every((row, i) => row[i] === 'FREE' || calledNumbers.includes(row[i]))) {
-      return { type: 'diagonal', position: 'main' };
-    }
-
-    // Verificar diagonal secundaria (top-right to bottom-left)
-    if (card.every((row, i) => row[4 - i] === 'FREE' || calledNumbers.includes(row[4 - i]))) {
-      return { type: 'diagonal', position: 'anti' };
-    }
-
-    return null;
-  }, [calledNumbers]);
-
   // Buscar todos los cartones ganadores
   const findWinnerCards = useCallback(() => {
     if (calledNumbers.length < 4) return []; // Mínimo 4 números para ganar
 
     const winners = [];
     bingoCardsData.forEach(cardData => {
-      const winPattern = checkBingo(cardData.card);
+      const winPattern = checkBingo(cardData.card, calledNumbers);
       if (winPattern) {
         winners.push({
           ...cardData,
@@ -93,7 +35,7 @@ export const useBingo = (gameId = null, initialCalledNumbers = []) => {
     });
 
     return winners;
-  }, [calledNumbers, checkBingo]);
+  }, [calledNumbers]);
 
   // Obtener siguiente número disponible
   const getNextNumber = useCallback(() => {

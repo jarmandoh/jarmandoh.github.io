@@ -39,7 +39,7 @@ const AdminLogin = ({ onLogin }) => {
     // Simular un pequeño delay para mejor UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    const success = onLogin(password);
+    const success = await onLogin(password);
     
     if (success) {
       setPassword('');

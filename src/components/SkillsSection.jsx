@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDesktop, faServer, faCloud } from '@fortawesome/free-solid-svg-icons';
+import { useScrollAnimation, randomDirection } from '../hooks/useScrollAnimation';
 
 const Skills = () => {
+  const [titleRef, titleVisible] = useScrollAnimation();
+  const [gridRef, gridVisible] = useScrollAnimation();
+  const titleDir = useRef(randomDirection()).current;
+  const cardDirs = useRef([randomDirection(), randomDirection(), randomDirection()]).current;
+
   const skillsData = [
     {
       title: 'Frontend',
@@ -55,12 +61,18 @@ const Skills = () => {
   return (
     <section id="habilidades" className="py-20 bg-gray-900 text-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">Mi Stack Tecnológico</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {skillsData.map((skillGroup) => (
+        <h2
+          ref={titleRef}
+          className={`text-4xl font-bold text-center mb-12 ${titleDir} ${titleVisible ? 'is-visible' : ''}`}
+        >
+          Mi Stack Tecnológico
+        </h2>
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {skillsData.map((skillGroup, index) => (
             <div
               key={skillGroup.title}
-              className="bg-gray-800 p-8 rounded-xl shadow-xl transition duration-500 hover:shadow-indigo-900"
+              className={`bg-gray-800 p-8 rounded-xl shadow-xl transition-[opacity,transform,box-shadow] duration-500 hover:shadow-indigo-900 ${cardDirs[index]} ${gridVisible ? 'is-visible' : ''}`}
+              style={{ transitionDelay: gridVisible ? `${index * 150}ms` : '0ms' }}
             >
               <h3 className="text-2xl font-semibold mb-4 flex items-center text-indigo-500">
                 {renderIcon(skillGroup.icon)}
