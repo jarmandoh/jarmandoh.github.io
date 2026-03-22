@@ -104,7 +104,7 @@ const CalledNumbersStrip = React.memo(({ calledNumbers }) => {
           <div className="flex justify-center">
             {mostRecent && (
               <div
-                className={`${getColumnColor(mostRecent)} text-white rounded-2xl px-8 py-6 font-black text-4xl min-w-[120px] text-center shadow-2xl transform transition-all ${
+                className={`${getColumnColor(mostRecent)} text-white rounded-2xl px-8 py-6 font-black text-4xl min-w-30 text-center shadow-2xl transform transition-all ${
                   animatingNumber === mostRecent 
                     ? 'animate-slideDown' 
                     : ''
@@ -122,7 +122,7 @@ const CalledNumbersStrip = React.memo(({ calledNumbers }) => {
               {previousNumbers.map((num, idx) => (
                 <div
                   key={`${num}-${idx}`}
-                  className={`${getColumnColor(num)} text-white rounded-xl px-4 py-3 font-bold text-lg min-w-[60px] text-center shadow-md transform transition-all hover:scale-110 ${
+                  className={`${getColumnColor(num)} text-white rounded-xl px-4 py-3 font-bold text-lg min-w-15 text-center shadow-md transform transition-all hover:scale-110 ${
                     idx === 0 ? 'animate-slideToSecondRow' : ''
                   }`}
                 >

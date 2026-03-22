@@ -80,6 +80,11 @@ const GestorGamesSection = ({ games, currentGame, onCreateGame, onStartGame, onF
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{game.calledNumbers?.length || 0}/75</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex gap-2">
+                      {game.status !== 'finished' && currentGame?.id !== game.id && (
+                        <button onClick={() => onSelectGame(game.id)} className="text-blue-600 hover:text-blue-900" title="Seleccionar este juego">
+                          <FontAwesomeIcon icon={faCheckCircle} />
+                        </button>
+                      )}
                       {game.status === 'waiting' && (
                         <button onClick={() => onStartGame(game.id)} className="text-green-600 hover:text-green-900" title="Iniciar juego">
                           <FontAwesomeIcon icon={faPlay} />
@@ -659,19 +664,40 @@ const BingoGestorContent = () => {
 
   if (!currentGame) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md">
-          <FontAwesomeIcon icon={faGamepad} className="text-6xl text-red-500 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Juego No Disponible</h2>
-          <p className="text-gray-600 mb-6">
-            El juego asignado no está disponible o ha sido eliminado.
-          </p>
-          <button
-            onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg transition-colors"
-          >
-            Volver al Login
-          </button>
+      <div className="min-h-screen bg-linear-to-br from-blue-200 via-purple-100 to-pink-200 p-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-lg flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-700 mb-1">
+                Hola, {gestor?.name || 'Gestor'} 🌟
+              </h1>
+              <p className="text-gray-500">
+                Crea un juego nuevo o selecciona uno existente para gestionar el sorteo.
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="bg-red-200 hover:bg-red-300 text-red-800 px-4 py-2 rounded-lg transition-colors inline-flex items-center"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+              Salir
+            </button>
+          </div>
+          <GestorGamesSection
+            games={games}
+            currentGame={null}
+            onStartGame={handleStartGame}
+            onFinishGame={handleFinishGame}
+            onDeleteGame={handleDeleteGame}
+            onSelectGame={handleSelectGame}
+            onShowGameForm={() => setShowGameForm(true)}
+          />
+          {showGameForm && (
+            <GameCreationModal
+              onCreateGame={handleCreateGame}
+              onClose={() => setShowGameForm(false)}
+            />
+          )}
         </div>
       </div>
     );

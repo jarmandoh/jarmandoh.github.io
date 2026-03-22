@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { hashPassword } from '../utils/hashPassword';
 
 export const useGestorAuth = () => {
   const [gestor, setGestor] = useState(null);
@@ -30,50 +29,37 @@ export const useGestorAuth = () => {
     setLoading(false);
   }, []);
 
-  const loginGestor = (gameId, password, gestorName) => {
-    return new Promise(async (resolve, reject) => {
+  /**
+   * Autentica al gestor contra la lista de contraseñas creadas por el admin
+   * (localStorage 'gestorPasswords'). No requiere que exista un juego previo.
+   */
+  const loginGestor = (password, gestorName) => {
+    return new Promise((resolve, reject) => {
       try {
-        // Obtener el juego para verificar la contraseña
-        const games = JSON.parse(localStorage.getItem('bingoGames') || '[]');
-        const game = games.find(g => g.id === gameId);
-        
-        if (!game) {
-          reject(new Error('Juego no encontrado'));
-          return;
-        }
+        const gestorPasswords = JSON.parse(localStorage.getItem('gestorPasswords') || '[]');
+        const matchingPassword = gestorPasswords.find(
+          gp => gp.isActive && gp.password === password.trim()
+        );
 
-        if (!game.gestorPassword) {
-          reject(new Error('Este juego no tiene contraseña de gestor configurada'));
-          return;
-        }
-
-        const inputHash = await hashPassword(password);
-        if (game.gestorPassword !== inputHash) {
+        if (!matchingPassword) {
           reject(new Error('Contraseña incorrecta'));
           return;
         }
 
-        // Crear sesión de gestor
         const gestorSession = {
           id: Date.now(),
-          name: gestorName,
-          gameId: gameId,
-          gameName: game.name,
+          name: gestorName.trim() || matchingPassword.gestorName,
+          gestorPasswordId: matchingPassword.id,
+          gameId: null,
+          gameName: null,
           loginTime: new Date().toISOString(),
-          expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 horas
+          expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000), // 24 horas
         };
 
         localStorage.setItem('gestorSession', JSON.stringify(gestorSession));
-        
-        // Actualizar estados de manera sincrónica
         setGestor(gestorSession);
         setIsAuthenticated(true);
-        
-
-        // Resolver después de actualizar el estado
-        setTimeout(() => {
-          resolve(gestorSession);
-        }, 0);
+        setTimeout(() => resolve(gestorSession), 0);
       } catch (error) {
         reject(error);
       }

@@ -66,20 +66,11 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
   ];
 
   const handlePatternToggle = (patternId) => {
-    if (raffleConfigMode) {
-      // Selección única (radio)
-      setFormData(prev => ({
-        ...prev,
-        winPatterns: prev.winPatterns[0] === patternId ? [] : [patternId]
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        winPatterns: prev.winPatterns.includes(patternId)
-          ? prev.winPatterns.filter(p => p !== patternId)
-          : [...prev.winPatterns, patternId]
-      }));
-    }
+    // Selección única (radio) en todos los modos
+    setFormData(prev => ({
+      ...prev,
+      winPatterns: prev.winPatterns[0] === patternId ? [] : [patternId]
+    }));
   };
 
   const handleCustomPatternToggle = (index) => {
@@ -187,7 +178,7 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
               key={index}
               className={`gcm-preview-cell ${isHighlighted ? 'gcm-preview-highlighted' : ''} ${isFree ? 'gcm-preview-free' : ''}`}
             >
-              {isFree ? 'F' : ''}
+              {isFree ? <img src="/capibara_software.png" alt="free" className="gcm-preview-free-logo" /> : ''}
             </div>
           );
         })}
@@ -331,12 +322,9 @@ const GameCreationModal = ({ onCreateGame, onClose, raffleConfigMode = false, in
                     onChange={() => handlePatternToggle(pattern.id)}
                     className="gcm-pattern-checkbox"
                   />
-                  <div className="gcm-pattern-header">
-                    <span className="gcm-pattern-icon">{pattern.icon}</span>
-                    {formData.winPatterns.includes(pattern.id) && (
-                      <FontAwesomeIcon icon={faCheck} className="gcm-pattern-check" />
-                    )}
-                  </div>
+                  {formData.winPatterns.includes(pattern.id) && (
+                    <FontAwesomeIcon icon={faCheck} className="gcm-pattern-check" />
+                  )}
                   
                   {renderPatternPreview(pattern.id)}
                   

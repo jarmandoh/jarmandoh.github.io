@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { hashPassword } from '../../utils/hashPassword';
 import { 
   faHome, 
   faEye, 
   faEyeSlash,
-  faListOl,
-  faExclamationTriangle
+  faListOl
 } from '@fortawesome/free-solid-svg-icons';
-import { useGameManager } from '../../hooks/useGameManager';
 import './GestorLogin.css';
 
 const GestorLogin = ({ onLogin }) => {
-  const { games } = useGameManager();
   const [formData, setFormData] = useState({
     password: '',
     gestorName: ''
@@ -44,24 +40,13 @@ const GestorLogin = ({ onLogin }) => {
         throw new Error('Ingresa tu nombre');
       }
 
-      const inputHash = await hashPassword(formData.password.trim());
-      const matchingGame = availableGames.find(g => g.gestorPassword === inputHash);
-      if (!matchingGame) {
-        throw new Error('Contraseña incorrecta o sin juego activo disponible');
-      }
-
-      await onLogin(matchingGame.id, formData.password.trim(), formData.gestorName.trim());
+      await onLogin(formData.password.trim(), formData.gestorName.trim());
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
   };
-
-  // Filtrar solo juegos activos que tengan contraseña de gestor
-  const availableGames = games.filter(game => 
-    game.status === 'active' && game.gestorPassword
-  );
 
   return (
     <div className="gestor-login-container">
@@ -76,18 +61,6 @@ const GestorLogin = ({ onLogin }) => {
             Accede para gestionar tu sorteo asignado
           </p>
         </div>
-
-        {/* Mensaje de juegos disponibles */}
-        {availableGames.length === 0 && (
-          <div className="gestor-warning-message">
-            <div className="gestor-warning-content">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="gestor-warning-icon" />
-              <span className="gestor-warning-text">
-                No hay juegos activos con gestor habilitado
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="gestor-form">
@@ -143,9 +116,8 @@ const GestorLogin = ({ onLogin }) => {
           <div className="gestor-buttons">
             <button
               type="submit"
-              disabled={loading || availableGames.length === 0}
+              disabled={loading}
               className="gestor-submit-button"
-              title={availableGames.length === 0 ? 'No hay juegos activos con gestor habilitado' : ''}
             >
               {loading ? 'Verificando...' : 'Acceder al Sorteo'}
             </button>

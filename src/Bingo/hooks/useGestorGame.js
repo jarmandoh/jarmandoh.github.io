@@ -342,7 +342,9 @@ export function useGestorGame() {
   };
 
   const handleCreateGame = (gameData) => {
-    createGame(gameData);
+    const newGame = createGame(gameData);
+    setCurrentGame(newGame);
+    setViewMode('game');
     setShowGameForm(false);
   };
 
@@ -369,7 +371,10 @@ export function useGestorGame() {
 
   const handleSelectGame = (gameId) => {
     const game = getGameById(gameId);
-    if (game) setCurrentGame(game);
+    if (game) {
+      setCurrentGame(game);
+      setViewMode('game');
+    }
   };
 
   const handleTestAssignment = () => {
