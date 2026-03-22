@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
+import ViewTransitionInterceptor from './components/ViewTransitionInterceptor';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -33,6 +34,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <ViewTransitionInterceptor />
         <div className="min-h-screen flex flex-col bg-gray-50">
           <Suspense fallback={<div className="w-full h-screen flex items-center justify-center text-xl">Cargando...</div>}>
             <Routes>

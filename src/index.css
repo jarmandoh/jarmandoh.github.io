@@ -118,6 +118,64 @@ html {
 .animate-slideToSecondRow {
   animation: slideToSecondRow 0.5s ease-out forwards;
 }
+
+/* ============================================================
+   VIEW TRANSITIONS – animaciones de navegación entre rutas
+   ============================================================ */
+
+/* Salida: la página antigua se desvanece y sube levemente */
+@keyframes vt-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.99);
+    filter: blur(2px);
+  }
+}
+
+/* Entrada: la página nueva sube desde abajo con fade-in */
+@keyframes vt-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.99);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Asignar las animaciones a los pseudo-elementos de transición */
+::view-transition-old(root) {
+  animation: vt-slide-out 0.25s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-slide-in 0.3s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* En dark mode se mantiene la misma animación */
+html.dark::view-transition-old(root) {
+  animation: vt-slide-out 0.25s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+html.dark::view-transition-new(root) {
+  animation: vt-slide-in 0.3s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Reducir movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.1s;
+  }
+}
 /* Animaciones para sistema de Reservas */
 @keyframes fadeIn {
   from {
