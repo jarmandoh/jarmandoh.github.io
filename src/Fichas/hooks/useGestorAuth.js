@@ -1,39 +1,53 @@
 import { useState, useEffect } from 'react';
 
-const GESTOR_PASSWORD = 'gestor123'; // En producción, esto debería venir del servidor
+const FICHAS_SERVER_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 
 export const useGestorAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [gestorData, setGestorData] = useState(null);
 
   useEffect(() => {
-    // Verificar si hay sesión de gestor guardada
     const savedGestor = localStorage.getItem('fichasGestorData');
     if (savedGestor) {
-      const data = JSON.parse(savedGestor);
-      setGestorData(data);
-      setIsAuthenticated(true);
+      try {
+        const data = JSON.parse(savedGestor);
+        if (data.token) {
+          setGestorData(data);
+          setIsAuthenticated(true);
+        }
+      } catch {
+        localStorage.removeItem('fichasGestorData');
+      }
     }
   }, []);
 
-  const login = (password) => {
-    if (password === GESTOR_PASSWORD) {
-      const data = {
-        role: 'gestor',
-        loginAt: new Date().toISOString(),
-      };
-      localStorage.setItem('fichasGestorData', JSON.stringify(data));
-      setGestorData(data);
+  const login = async (password) => {
+    try {
+      const res = await fetch(`${FICHAS_SERVER_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'gestor', password, role: 'gestor' }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.message || 'Error al iniciar sesión' };
+      }
+      const gestorInfo = { ...data.user, token: data.token, loginAt: new Date().toISOString() };
+      localStorage.setItem('fichasGestorData', JSON.stringify(gestorInfo));
+      setGestorData(gestorInfo);
       setIsAuthenticated(true);
+      window.dispatchEvent(new Event('fichas-auth-change'));
       return { success: true };
+    } catch {
+      return { success: false, error: 'No se pudo conectar al servidor' };
     }
-    return { success: false, error: 'Contraseña incorrecta' };
   };
 
   const logout = () => {
     localStorage.removeItem('fichasGestorData');
     setGestorData(null);
     setIsAuthenticated(false);
+    window.dispatchEvent(new Event('fichas-auth-change'));
   };
 
   return {

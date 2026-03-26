@@ -1,33 +1,57 @@
 
+import 'dotenv/config';
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import process from 'process';
 
+// Hashes bcrypt de las credenciales de gestor y admin.
+// Generados con bcrypt coste 10 para 'gestor123' y 'admin123'.
+// Si se cambian las contraseñas, regenerar con: node -e "import('bcrypt').then(b=>b.hash('NUEVA_PASS',10).then(console.log))"
+const CREDENTIAL_HASHES = {
+  gestor: '$2b$10$cnxQiJqrDGzz/sWEDrF0ru.KYSzkRjhs4hfATa1Q0QFOHWK.fgMue',
+  admin:  '$2b$10$3d4XUNLGaGzX3jjg8r.zDu818TniIGQoJLgMAqtIYD2.h1XxMSbAC',
+};
+
 const app = express();
 const server = http.createServer(app);
 
-// Ruta de login para obtener un token JWT (ejemplo básico)
-app.use(express.json());
-app.post('/login', (req, res) => {
-  const { username, password, role } = req.body;
-  // Validación simulada (en producción, validar contra base de datos)
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Usuario y contraseña requeridos' });
-  }
-  // Simulación de autenticación exitosa
-  const user = { username, role: role || 'player' };
-  const token = jwt.sign(user, JWT_SECRET, { expiresIn: '2h' });
-  res.json({ token, user });
-});
-
-// Clave secreta para JWT (en producción usar variable de entorno)
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto123';
 
 // Configurar CORS
 app.use(cors());
+
+app.use(express.json());
+app.post('/login', async (req, res) => {
+  const { username, password, role } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Usuario y contraseña requeridos' });
+  }
+  const resolvedRole = role || 'player';
+
+  // Jugadores no tienen contraseña — solo necesitan un username
+  if (resolvedRole === 'player') {
+    const user = { username, role: 'player' };
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: '8h' });
+    return res.json({ token, user });
+  }
+
+  // Gestores y admins validan contraseña contra hash bcrypt
+  const hash = CREDENTIAL_HASHES[resolvedRole];
+  if (!hash) {
+    return res.status(403).json({ message: 'Rol no autorizado' });
+  }
+  const valid = await bcrypt.compare(password, hash);
+  if (!valid) {
+    return res.status(401).json({ message: 'Credenciales incorrectas' });
+  }
+  const user = { username, role: resolvedRole };
+  const token = jwt.sign(user, JWT_SECRET, { expiresIn: '2h' });
+  res.json({ token, user });
+});
 
 // Middleware de autenticación JWT para rutas HTTP
 function authenticateJWT(req, res, next) {
@@ -408,8 +432,8 @@ app.get('/', authenticateJWT, (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 server.listen(PORT, () => {
-  console.log(`🎲 Servidor de Fichas a 100 corriendo en puerto ${PORT}`);
-  console.log(`📡 Socket.io path: /fichas-socket`);
+  console.log(`Servidor de Fichas a 100 corriendo en puerto ${PORT}`);
+  console.log(`Socket.io path: /fichas-socket`);
 });

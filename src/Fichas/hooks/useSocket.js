@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useFichasSocket } from '../context/SocketContext';
+import { useFichasSocket, useFichasConnectionStatus } from '../context/SocketContext';
 
 export const useSocket = () => {
-  const fichasSocket = useFichasSocket();
-  const socket = fichasSocket && fichasSocket.socket !== undefined ? fichasSocket.socket : fichasSocket;
-  const connected = fichasSocket && fichasSocket.connected !== undefined ? fichasSocket.connected : false;
+  const socket = useFichasSocket();
+  const connected = useFichasConnectionStatus();
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [gameState, setGameState] = useState(null);
@@ -43,8 +42,6 @@ export const useSocket = () => {
       socket.off('game-state-updated');
       socket.off('error');
     };
-    // Limpiar error manualmente
-    const clearError = () => setError('');
   }, [socket]);
 
   // Funciones para interactuar con el servidor
